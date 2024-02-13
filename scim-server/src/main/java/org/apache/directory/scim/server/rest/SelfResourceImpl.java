@@ -35,8 +35,12 @@ import org.apache.directory.scim.protocol.UserResource;
 import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
 import org.apache.directory.scim.protocol.data.PatchRequest;
 import org.apache.directory.scim.protocol.exception.ScimException;
+import org.apache.directory.scim.spec.resources.ScimResource;
 import org.apache.directory.scim.spec.resources.ScimUser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.WebRequest;
+
 
 @Slf4j
 @ApplicationScoped
@@ -63,9 +67,9 @@ public class SelfResourceImpl implements SelfResource {
   }
 
   @Override
-  public Response getSelf(AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+  public ResponseEntity<? extends ScimResource> getSelf(WebRequest request, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     String internalId = getInternalId();
-    return userResource.getById(internalId, attributes, excludedAttributes);
+    return userResource.getById(request, internalId, attributes, excludedAttributes);
   }
 
   // @Override
@@ -77,15 +81,15 @@ public class SelfResourceImpl implements SelfResource {
   // }
 
   @Override
-  public Response update(ScimUser resource, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+  public Response update(WebRequest request, ScimUser resource, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     String internalId = getInternalId();
-    return userResource.update(resource, internalId, attributes, excludedAttributes);
+    return userResource.update(request, resource, internalId, attributes, excludedAttributes);
   }
 
   @Override
-  public Response patch(PatchRequest patchRequest, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+  public Response patch(WebRequest request, PatchRequest patchRequest, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     String internalId = getInternalId();
-    return userResource.patch(patchRequest, internalId, attributes, excludedAttributes);
+    return userResource.patch(request, patchRequest, internalId, attributes, excludedAttributes);
   }
 
   @Override

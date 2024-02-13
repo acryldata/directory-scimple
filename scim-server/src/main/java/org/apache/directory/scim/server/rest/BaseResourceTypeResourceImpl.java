@@ -28,7 +28,6 @@ import java.util.Set;
 
 import jakarta.enterprise.inject.spi.CDI;
 import jakarta.ws.rs.core.*;
-import jakarta.ws.rs.core.Response.ResponseBuilder;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.Response.Status.Family;
 
@@ -62,6 +61,11 @@ import org.apache.directory.scim.spec.filter.SortRequest;
 import org.apache.directory.scim.spec.resources.ScimResource;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+
 @Slf4j
 public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> implements BaseResourceTypeResource<T> {
 
@@ -72,14 +76,6 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   private final  AttributeUtil attributeUtil;
 
   private final Class<T> resourceClass;
-
-  // TODO: Field injection of UriInfo, Request should work with all implementations
-  // CDI can be used directly in Jakarta WS 4
-  @Context
-  UriInfo uriInfo;
-
-  @Context
-  Request request;
 
   @Context
   HttpHeaders headers;
@@ -103,9 +99,9 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   }
 
   @Override
-  public Response getById(String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    if (uriInfo.getQueryParameters().getFirst("filter") != null) {
-      return Response.status(Status.FORBIDDEN).build();
+  public ResponseEntity<T> getById(WebRequest request, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    if (request.getParameter("filter") != null) {
+      return ResponseEntity.status(Status.FORBIDDEN.getStatusCode()).build();
     }
 
     Repository<T> repository = getRepositoryInternal();
@@ -124,11 +120,12 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
       throw notFoundException(id);
     }
 
-    EntityTag etag = fromVersion(resource);
+    String etag = fromVersion(resource);
+
     if (etag != null) {
-      ResponseBuilder evaluatePreconditionsResponse = request.evaluatePreconditions(etag);
-      if (evaluatePreconditionsResponse != null) {
-        return Response.status(Status.NOT_MODIFIED).build();
+
+      if (request.checkNotModified(etag)) {
+        return ResponseEntity.status(Status.NOT_MODIFIED.getStatusCode()).build();
       }
     }
 
@@ -139,11 +136,15 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     // Process Attributes
     resource = processFilterAttributeExtensions(repository, resource, attributeReferences, excludedAttributeReferences);
     resource = attributesForDisplayThrowOnError(resource, attributeReferences, excludedAttributeReferences);
-    return Response.ok()
-                   .entity(resource)
-                   .location(buildLocationTag(resource))
-                   .tag(etag)
-                   .build();
+
+    ResponseEntity.BodyBuilder bodyBuilder =  ResponseEntity.ok()
+      .header(HttpHeaders.LOCATION, buildLocationTag(resource).toString());
+
+    if (etag != null) {
+      bodyBuilder.header(HttpHeaders.ETAG, etag);
+    }
+
+    return bodyBuilder.body(resource);
   }
 
   @Override
@@ -177,7 +178,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
 
     T created = repository.create(resource);
 
-    EntityTag etag = fromVersion(created);
+    String etag = fromVersion(created);
 
     // Process Attributes
     created = processFilterAttributeExtensions(repository, created, attributeReferences, excludedAttributeReferences);
@@ -247,14 +248,14 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   }
 
   @Override
-  public Response update(T resource, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return update(attributes, excludedAttributes, (etag, includeAttributes, excludeAttributes, repository)
+  public Response update(WebRequest request, T resource, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    return update(request, attributes, excludedAttributes, (etag, includeAttributes, excludeAttributes, repository)
       -> repository.update(id, etag,resource, includeAttributes, excludeAttributes));
   }
 
   @Override
-  public Response patch(PatchRequest patchRequest, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return update(attributes, excludedAttributes, (etag, includeAttributes, excludeAttributes, repository)
+  public Response patch(WebRequest request, PatchRequest patchRequest, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    return update(request,attributes, excludedAttributes, (etag, includeAttributes, excludeAttributes, repository)
       -> repository.patch(id, etag, patchRequest.getPatchOperationList(), includeAttributes, excludeAttributes));
   }
 
@@ -266,7 +267,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
         .build();
   }
 
-  private Response update(AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes, UpdateFunction<T> updateFunction) throws ScimException, ResourceException {
+  private Response update(WebRequest request, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes, UpdateFunction<T> updateFunction) throws ScimException, ResourceException {
 
     Repository<T> repository = getRepositoryInternal();
 
@@ -274,14 +275,14 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     Set<AttributeReference> excludedAttributeReferences = AttributeReferenceListWrapper.getAttributeReferences(excludedAttributes);
     validateAttributes(attributeReferences, excludedAttributeReferences);
 
-    String requestEtag = headers.getHeaderString("ETag");
+    String requestEtag = request.getHeader("ETag");
     T updated = updateFunction.update(requestEtag, attributeReferences, excludedAttributeReferences, repository);
 
     // Process Attributes
     updated = processFilterAttributeExtensions(repository, updated, attributeReferences, excludedAttributeReferences);
     updated = attributesForDisplayIgnoreErrors(updated, attributeReferences, excludedAttributeReferences);
 
-    EntityTag etag = fromVersion(updated);
+    String etag = fromVersion(updated);
     return Response.ok(updated)
       .location(buildLocationTag(updated))
       .tag(etag)
@@ -319,9 +320,10 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
       LOG.warn("Repository must supply an id for a resource");
       id = "unknown";
     }
-    return uriInfo.getAbsolutePathBuilder()
-                  .path(id)
-                  .build();
+
+    return ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null)
+      .build().toUri();
+
   }
 
   private <T extends ScimResource> T attributesForDisplay(T resource, Set<AttributeReference> includedAttributes, Set<AttributeReference> excludedAttributes) throws AttributeException {
@@ -364,12 +366,12 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     }
   }
 
-  private EntityTag fromVersion(ScimResource resource) {
+  private String fromVersion(ScimResource resource) {
     Meta meta = resource.getMeta();
     if (meta != null) {
       String version = meta.getVersion();
       if (version != null) {
-        return new EntityTag(version);
+        return version;
       }
     }
     return null;

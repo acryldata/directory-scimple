@@ -24,12 +24,13 @@
     <version>1.0.0-M1</version>
   </parent>
 
-  <artifactId>scim-server</artifactId>
+  <artifactId>datahub-scim-server</artifactId>
   <name>SCIMple - Server</name>
   <packaging>jar</packaging>
 
   <properties>
     <module.name>org.apache.directory.scim.server</module.name>
+    <version.spring>6.1.2</version.spring>
   </properties>
 
   <dependencies>
@@ -68,7 +69,8 @@
     </dependency>
     <dependency>
       <groupId>org.apache.directory.scimple</groupId>
-      <artifactId>scim-spec-protocol</artifactId>
+      <artifactId>datahub-scim-spec-protocol</artifactId>
+      <version>1.0.0-M1</version>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
@@ -155,7 +157,18 @@
       <artifactId>weld-se-core</artifactId>
       <scope>test</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+      <version>${version.spring}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-webmvc</artifactId>
+      <version>${version.spring}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>

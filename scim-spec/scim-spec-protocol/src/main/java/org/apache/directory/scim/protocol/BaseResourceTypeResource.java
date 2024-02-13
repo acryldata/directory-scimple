@@ -41,16 +41,17 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-
-import org.apache.directory.scim.protocol.data.PatchRequest;
-import org.apache.directory.scim.protocol.exception.ScimException;
 import org.apache.directory.scim.protocol.adapter.FilterWrapper;
+import org.apache.directory.scim.protocol.data.PatchRequest;
+import org.apache.directory.scim.protocol.data.SearchRequest;
+import org.apache.directory.scim.protocol.exception.ScimException;
 import org.apache.directory.scim.spec.exception.ResourceException;
+import org.apache.directory.scim.spec.filter.SortOrder;
 import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
 import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
-import org.apache.directory.scim.protocol.data.SearchRequest;
-import org.apache.directory.scim.spec.filter.SortOrder;
 import org.apache.directory.scim.spec.resources.ScimResource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.context.request.WebRequest;
 
 @Tag(name="SCIM")
 @Hidden
@@ -75,10 +76,10 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode="500", description="Internal Server Error"),
     @ApiResponse(responseCode="501", description="Not Implemented")
   })
-    default Response getById(@Parameter(name="id", required=true) @PathParam("id") String id,
+    default ResponseEntity<T> getById(WebRequest request, @Parameter(name="id", required=true) @PathParam("id") String id,
                              @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
                              @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
   /**
@@ -169,7 +170,9 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "400", description = "Bad Request"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response update(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+  default Response update(
+    WebRequest request,
+    @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = ScimResource.class)),
                                        required = true) T resource,
                           @PathParam("id") String id,
@@ -189,7 +192,7 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "404", description = "Not found"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response patch(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+  default Response patch(WebRequest request, @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                       schema = @Schema(implementation = PatchRequest.class)),
                                       required = true) PatchRequest patchRequest,
                          @PathParam("id") String id,
