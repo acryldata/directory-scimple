@@ -29,19 +29,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
 import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import org.apache.directory.scim.protocol.adapter.FilterWrapper;
+import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.protocol.data.PatchRequest;
 import org.apache.directory.scim.protocol.data.SearchRequest;
 import org.apache.directory.scim.protocol.exception.ScimException;
@@ -51,6 +44,13 @@ import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
 import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
 import org.apache.directory.scim.spec.resources.ScimResource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.WebRequest;
 
 @Tag(name="SCIM")
@@ -65,7 +65,7 @@ public interface BaseResourceTypeResource<T> {
    * @throws UnableToRetrieveResourceException
    */
   @GET
-  @Path("{id}")
+  @GetMapping("{id}")
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description="Find by id")
   @ApiResponses(value={
@@ -76,9 +76,9 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode="500", description="Internal Server Error"),
     @ApiResponse(responseCode="501", description="Not Implemented")
   })
-    default ResponseEntity<T> getById(WebRequest request, @Parameter(name="id", required=true) @PathParam("id") String id,
-                             @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                             @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    default ResponseEntity<T> getById(WebRequest request, @Parameter(name="id", required=true) @PathVariable(name = "id") String id,
+                             @Parameter(name="attributes") @RequestParam(name = "attributes") AttributeReferenceListWrapper attributes,
+                             @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
@@ -87,7 +87,7 @@ public interface BaseResourceTypeResource<T> {
    *      query resources</a>
    * @return
    */
-  @GET
+  @GetMapping
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description="Find by a combination of query parameters")
   @ApiResponses(value={
@@ -98,14 +98,14 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode="500", description="Internal Server Error"),
     @ApiResponse(responseCode="501", description="Not Implemented")
   })
-  default Response query(@Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                         @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes,
-                         @Parameter(name="filter") @QueryParam("filter") FilterWrapper filterWrapper,
-                         @Parameter(name="sortBy") @QueryParam("sortBy") AttributeReference sortBy,
-                         @Parameter(name="sortOrder") @QueryParam("sortOrder") SortOrder sortOrder,
-                         @Parameter(name="startIndex") @QueryParam("startIndex") Integer startIndex,
-                         @Parameter(name="count") @QueryParam("count") Integer count) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+  default ResponseEntity<ListResponse<T>> query(@Parameter(name="attributes") @RequestParam(name = "attributes") AttributeReferenceListWrapper attributes,
+                         @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes") AttributeReferenceListWrapper excludedAttributes,
+                         @Parameter(name="filter") @RequestParam(name = "filter") FilterWrapper filterWrapper,
+                         @Parameter(name="sortBy") @RequestParam(name = "sortBy") AttributeReference sortBy,
+                         @Parameter(name="sortOrder") @RequestParam(name = "sortOrder") SortOrder sortOrder,
+                         @Parameter(name="startIndex") @RequestParam(name = "startIndex") Integer startIndex,
+                         @Parameter(name="count") @RequestParam(name = "count") Integer count) throws ScimException, ResourceException {
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
   /**
@@ -113,7 +113,7 @@ public interface BaseResourceTypeResource<T> {
    *      query resources</a>
    * @return
    */
-  @POST
+  @PostMapping
   @Consumes({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Create")
@@ -125,12 +125,12 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "409", description = "Conflict"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response create(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+  default ResponseEntity<T> create(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = ScimResource.class)),
                                        required = true) T resource,
-                          @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                          @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+                          @Parameter(name="attributes") @RequestParam(name = "attributes") AttributeReferenceListWrapper attributes,
+                          @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
   /**
@@ -138,8 +138,7 @@ public interface BaseResourceTypeResource<T> {
    *      query with post</a>
    * @return
    */
-  @POST
-  @Path("/.search")
+  @PostMapping("/.search")
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Search")
   @ApiResponses(value = {
@@ -148,10 +147,10 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "400", description = "Bad Request"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response find(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+  default ResponseEntity<ListResponse<T>> find(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                      schema = @Schema(implementation = SearchRequest.class)),
                                      required = true) SearchRequest request) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
   /**
@@ -159,8 +158,7 @@ public interface BaseResourceTypeResource<T> {
    *      update</a>
    * @return
    */
-  @PUT
-  @Path("{id}")
+  @PutMapping("{id}")
   @Consumes({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Update")
@@ -170,19 +168,18 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "400", description = "Bad Request"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response update(
+  default ResponseEntity<T> update(
     WebRequest request,
     @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = ScimResource.class)),
                                        required = true) T resource,
-                          @PathParam("id") String id,
-                          @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                          @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+                          @PathVariable("id") String id,
+                          @Parameter(name="attributes") @RequestParam("attributes") AttributeReferenceListWrapper attributes,
+                          @Parameter(name="excludedAttributes") @RequestParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
-  @PATCH
-  @Path("{id}")
+  @PatchMapping("{id}")
   @Consumes({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Patch a portion of the backing store")
@@ -192,17 +189,16 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "404", description = "Not found"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response patch(WebRequest request, @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+  default ResponseEntity<T> patch(WebRequest request, @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                       schema = @Schema(implementation = PatchRequest.class)),
                                       required = true) PatchRequest patchRequest,
-                         @PathParam("id") String id,
-                         @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                         @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+                         @PathVariable("id") String id,
+                         @Parameter(name="attributes") @RequestParam("attributes") AttributeReferenceListWrapper attributes,
+                         @Parameter(name="excludedAttributes") @RequestParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
-  @DELETE
-  @Path("{id}")
+  @DeleteMapping("{id}")
   @Operation(description = "Delete from the backing store")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "No Content"),
@@ -210,7 +206,7 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "404", description = "Not found"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response delete(@Parameter(name = "id", required = true) @PathParam("id") String id) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+  default ResponseEntity<T> delete(@Parameter(name = "id", required = true) @PathVariable("id") String id) throws ScimException, ResourceException {
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 }

@@ -35,6 +35,7 @@ import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
 import org.apache.directory.scim.protocol.exception.ScimException;
 import org.apache.directory.scim.spec.exception.ResourceException;
+import org.apache.directory.scim.spec.resources.ScimResource;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -55,6 +56,8 @@ import org.apache.directory.scim.spec.resources.ScimUser;
 import org.apache.directory.scim.spec.resources.PhoneNumber.GlobalPhoneNumberBuilder;
 import org.apache.directory.scim.spec.resources.PhoneNumber.LocalPhoneNumberBuilder;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+
 
 @ExtendWith(MockitoExtension.class)
 public class BaseResourceTypeResourceImplTest {
@@ -109,17 +112,17 @@ public class BaseResourceTypeResourceImplTest {
     searchRequest.setAttributes(Collections.emptySet());
     searchRequest.setExcludedAttributes(Collections.emptySet());
 
-    when(baseResourceImpl.find(searchRequest)).thenReturn(Response.ok().build());
+    when(baseResourceImpl.find(searchRequest)).thenReturn(ResponseEntity.ok().build());
     
     when(baseResourceImpl.query(null, null, null, null, null, null, null)).thenCallRealMethod();
     
     // when
-    Response response = baseResourceImpl.query(null, null, null, null, null, null, null);
+    ResponseEntity<? extends ScimResource> response = baseResourceImpl.query(null, null, null, null, null, null, null);
     
     // then
     verify(baseResourceImpl, times(1)).find(searchRequest);
     assertNotNull(response);
-    assertEquals(response.getStatus(), Status.OK.getStatusCode());
+    assertEquals(response.getStatusCode().value(), Status.OK.getStatusCode());
   }
   
   @Test

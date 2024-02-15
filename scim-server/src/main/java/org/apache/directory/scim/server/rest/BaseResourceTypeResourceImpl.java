@@ -19,49 +19,54 @@
 
 package org.apache.directory.scim.server.rest;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.Response.Status;
+import jakarta.ws.rs.core.Response.Status.Family;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import jakarta.enterprise.inject.spi.CDI;
-import jakarta.ws.rs.core.*;
-import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.Response.Status.Family;
-
-import org.apache.directory.scim.protocol.exception.ScimException;
-import org.apache.directory.scim.server.exception.*;
-import org.apache.directory.scim.core.repository.RepositoryRegistry;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.directory.scim.core.repository.Repository;
-import org.apache.directory.scim.core.schema.SchemaRegistry;
-import org.apache.directory.scim.spec.exception.ResourceException;
-import org.apache.directory.scim.spec.schema.Meta;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import org.apache.directory.scim.core.repository.RepositoryRegistry;
 import org.apache.directory.scim.core.repository.annotations.ScimProcessingExtension;
 import org.apache.directory.scim.core.repository.extensions.AttributeFilterExtension;
-import org.apache.directory.scim.core.repository.extensions.ProcessingExtension;
-import org.apache.directory.scim.spec.filter.attribute.ScimRequestContext;
 import org.apache.directory.scim.core.repository.extensions.ClientFilterException;
-import org.apache.directory.scim.protocol.adapter.FilterWrapper;
+import org.apache.directory.scim.core.repository.extensions.ProcessingExtension;
+import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.apache.directory.scim.protocol.BaseResourceTypeResource;
-import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
-import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
+import org.apache.directory.scim.protocol.Constants;
+import org.apache.directory.scim.protocol.adapter.FilterWrapper;
 import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.protocol.data.PatchRequest;
 import org.apache.directory.scim.protocol.data.SearchRequest;
-import org.apache.directory.scim.spec.filter.FilterResponse;
+import org.apache.directory.scim.protocol.exception.ScimException;
+import org.apache.directory.scim.server.exception.AttributeException;
+import org.apache.directory.scim.server.exception.UnableToRetrieveResourceException;
+import org.apache.directory.scim.spec.exception.ResourceException;
 import org.apache.directory.scim.spec.filter.Filter;
+import org.apache.directory.scim.spec.filter.FilterResponse;
 import org.apache.directory.scim.spec.filter.PageRequest;
 import org.apache.directory.scim.spec.filter.SortOrder;
 import org.apache.directory.scim.spec.filter.SortRequest;
+import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
+import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
+import org.apache.directory.scim.spec.filter.attribute.ScimRequestContext;
 import org.apache.directory.scim.spec.resources.ScimResource;
-import lombok.extern.slf4j.Slf4j;
-
+import org.apache.directory.scim.spec.schema.Meta;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -76,9 +81,6 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   private final  AttributeUtil attributeUtil;
 
   private final Class<T> resourceClass;
-
-  @Context
-  HttpHeaders headers;
 
   public BaseResourceTypeResourceImpl(SchemaRegistry schemaRegistry, RepositoryRegistry repositoryRegistry, Class<T> resourceClass) {
     this.repositoryRegistry = repositoryRegistry;
@@ -98,8 +100,13 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     return repository;
   }
 
+  // Annotations on interfaces are not inherited by implementing classes.
+  // Spring doesn't perform any lookup on interface to resolve annotation, hence need to duplicate the annotation
+  // from interface
   @Override
-  public ResponseEntity<T> getById(WebRequest request, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+  public ResponseEntity<T> getById(WebRequest request, @Parameter(name="id", required=true) @PathVariable(name = "id") String id,
+    @Parameter(name="attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+    @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     if (request.getParameter("filter") != null) {
       return ResponseEntity.status(Status.FORBIDDEN.getStatusCode()).build();
     }
@@ -138,7 +145,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     resource = attributesForDisplayThrowOnError(resource, attributeReferences, excludedAttributeReferences);
 
     ResponseEntity.BodyBuilder bodyBuilder =  ResponseEntity.ok()
-      .header(HttpHeaders.LOCATION, buildLocationTag(resource).toString());
+      .location(buildLocationTag(resource));
 
     if (etag != null) {
       bodyBuilder.header(HttpHeaders.ETAG, etag);
@@ -148,13 +155,19 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   }
 
   @Override
-  public Response query(AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes, FilterWrapper filter, AttributeReference sortBy, SortOrder sortOrder, Integer startIndex, Integer count) throws ScimException, ResourceException {
+  public ResponseEntity<ListResponse<T>> query(@Parameter(name="attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+    @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes,
+    @Parameter(name="filter") @RequestParam(name = "filter", required = false) FilterWrapper filterWrapper,
+    @Parameter(name="sortBy") @RequestParam(name = "sortBy", required = false) AttributeReference sortBy,
+    @Parameter(name="sortOrder") @RequestParam(name = "sortOrder", required = false) SortOrder sortOrder,
+    @Parameter(name="startIndex") @RequestParam(name = "startIndex", required = false) Integer startIndex,
+    @Parameter(name="count") @RequestParam(name = "count", required = false) Integer count) throws ScimException, ResourceException {
     SearchRequest searchRequest = new SearchRequest();
     searchRequest.setAttributes(AttributeReferenceListWrapper.getAttributeReferences(attributes));
     searchRequest.setExcludedAttributes(AttributeReferenceListWrapper.getAttributeReferences(excludedAttributes));
 
-    if (filter != null) {
-      searchRequest.setFilter(filter.getFilter());
+    if (filterWrapper != null) {
+      searchRequest.setFilter(filterWrapper.getFilter());
     }
     else {
       searchRequest.setFilter(null);
@@ -169,7 +182,11 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   }
 
   @Override
-  public Response create(T resource, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+  public ResponseEntity<T> create(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+    schema = @Schema(implementation = ScimResource.class)),
+    required = true) T resource,
+    @Parameter(name="attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+    @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     Repository<T> repository = getRepositoryInternal();
 
     Set<AttributeReference> attributeReferences = AttributeReferenceListWrapper.getAttributeReferences(attributes);
@@ -189,15 +206,16 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
         log.debug("Exception thrown while processing attributes", e);
     }
 
-    return Response.status(Status.CREATED)
-                   .location(buildLocationTag(created))
-                   .tag(etag)
-                   .entity(created)
-                   .build();
+    return ResponseEntity.status(Status.CREATED.getStatusCode())
+      .location(buildLocationTag(created))
+      .header(HttpHeaders.ETAG, etag)
+      .body(created);
   }
 
   @Override
-  public Response find(SearchRequest request) throws ScimException, ResourceException {
+  public ResponseEntity<ListResponse<T>> find(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+    schema = @Schema(implementation = SearchRequest.class)),
+    required = true) SearchRequest request) throws ScimException, ResourceException {
     Repository<T> repository = getRepositoryInternal();
 
     Set<AttributeReference> attributeReferences = Optional.ofNullable(request.getAttributes())
@@ -242,32 +260,42 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
       listResponse.setResources(results);
     }
 
-    return Response.ok()
-                   .entity(listResponse)
-                   .build();
+    return ResponseEntity.ok()
+          .body(listResponse);
   }
 
   @Override
-  public Response update(WebRequest request, T resource, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+  public ResponseEntity<T> update(WebRequest request,
+    @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+      schema = @Schema(implementation = ScimResource.class)),
+      required = true) T resource,
+    @PathVariable("id") String id,
+    @Parameter(name="attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+    @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     return update(request, attributes, excludedAttributes, (etag, includeAttributes, excludeAttributes, repository)
       -> repository.update(id, etag,resource, includeAttributes, excludeAttributes));
   }
 
   @Override
-  public Response patch(WebRequest request, PatchRequest patchRequest, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return update(request,attributes, excludedAttributes, (etag, includeAttributes, excludeAttributes, repository)
+  public ResponseEntity<T> patch(WebRequest request, @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
+    schema = @Schema(implementation = PatchRequest.class)),
+    required = true) PatchRequest patchRequest,
+    @PathVariable("id") String id,
+    @Parameter(name="attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+    @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    return update(request, attributes, excludedAttributes, (etag, includeAttributes, excludeAttributes, repository)
       -> repository.patch(id, etag, patchRequest.getPatchOperationList(), includeAttributes, excludeAttributes));
   }
 
   @Override
-  public Response delete(String id) throws ScimException, ResourceException {
+  public ResponseEntity<T> delete(@Parameter(name = "id", required = true) @PathVariable("id") String id) throws ScimException, ResourceException {
       Repository<T> repository = getRepositoryInternal();
       repository.delete(id);
-      return Response.noContent()
+      return ResponseEntity.noContent()
         .build();
   }
 
-  private Response update(WebRequest request, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes, UpdateFunction<T> updateFunction) throws ScimException, ResourceException {
+  private ResponseEntity<T> update(WebRequest request, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes, UpdateFunction<T> updateFunction) throws ScimException, ResourceException {
 
     Repository<T> repository = getRepositoryInternal();
 
@@ -283,10 +311,11 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     updated = attributesForDisplayIgnoreErrors(updated, attributeReferences, excludedAttributeReferences);
 
     String etag = fromVersion(updated);
-    return Response.ok(updated)
+
+    return ResponseEntity.ok()
       .location(buildLocationTag(updated))
-      .tag(etag)
-      .build();
+      .header(HttpHeaders.ETAG, etag)
+      .body(updated);
   }
 
   @SuppressWarnings("unchecked")
@@ -321,6 +350,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
       id = "unknown";
     }
 
+    // TODO: Fix it for id in pathSegment while creating resource
     return ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null)
       .build().toUri();
 

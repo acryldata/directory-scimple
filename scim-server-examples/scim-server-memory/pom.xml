@@ -18,10 +18,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.directory.scimple</groupId>
+    <groupId>io.acryl</groupId>
     <artifactId>scimple</artifactId>
     <version>1.0.0-M1</version>
-    <relativePath>../..</relativePath>
+    <relativePath>../../pom.xml</relativePath>
   </parent>
 
   <artifactId>scim-server-memory</artifactId>
@@ -46,7 +46,7 @@
       <artifactId>jakarta.enterprise.cdi-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.directory.scimple</groupId>
+      <groupId>io.acryl</groupId>
       <artifactId>scim-server</artifactId>
     </dependency>
     <dependency>

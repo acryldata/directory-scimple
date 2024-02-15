@@ -19,12 +19,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.apache.directory.scimple</groupId>
+    <groupId>io.acryl</groupId>
     <artifactId>scimple</artifactId>
     <version>1.0.0-M1</version>
   </parent>
 
-  <artifactId>datahub-scim-server</artifactId>
+  <artifactId>scim-server</artifactId>
   <name>SCIMple - Server</name>
   <packaging>jar</packaging>
 
@@ -60,17 +60,16 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.directory.scimple</groupId>
+      <groupId>io.acryl</groupId>
       <artifactId>scim-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.directory.scimple</groupId>
+      <groupId>io.acryl</groupId>
       <artifactId>scim-spec-schema</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.apache.directory.scimple</groupId>
-      <artifactId>datahub-scim-spec-protocol</artifactId>
-      <version>1.0.0-M1</version>
+      <groupId>io.acryl</groupId>
+      <artifactId>scim-spec-protocol</artifactId>
     </dependency>
     <dependency>
       <groupId>com.fasterxml.jackson.jakarta.rs</groupId>
@@ -82,7 +81,7 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.directory.scimple</groupId>
+      <groupId>io.acryl</groupId>
       <artifactId>scim-test</artifactId>
       <scope>test</scope>
     </dependency>
@@ -133,7 +132,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.directory.scimple</groupId>
+      <groupId>io.acryl</groupId>
       <artifactId>scim-compliance-tests</artifactId>
       <scope>test</scope>
     </dependency>

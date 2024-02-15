@@ -81,19 +81,19 @@ public class SelfResourceImpl implements SelfResource {
   // }
 
   @Override
-  public Response update(WebRequest request, ScimUser resource, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+  public ResponseEntity<? extends ScimResource> update(WebRequest request, ScimUser resource, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     String internalId = getInternalId();
     return userResource.update(request, resource, internalId, attributes, excludedAttributes);
   }
 
   @Override
-  public Response patch(WebRequest request, PatchRequest patchRequest, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+  public ResponseEntity<? extends ScimResource> patch(WebRequest request, PatchRequest patchRequest, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     String internalId = getInternalId();
     return userResource.patch(request, patchRequest, internalId, attributes, excludedAttributes);
   }
 
   @Override
-  public Response delete() throws ScimException, ResourceException {
+  public ResponseEntity<? extends ScimResource> delete() throws ScimException, ResourceException {
     String internalId = getInternalId();
     return userResource.delete(internalId);
   }

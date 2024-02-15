@@ -29,13 +29,17 @@ import org.apache.directory.scim.core.repository.RepositoryRegistry;
 import org.apache.directory.scim.protocol.UserResource;
 import org.apache.directory.scim.spec.resources.ScimUser;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 /**
  * @author shawn
  *
  */
 @Slf4j
-@ApplicationScoped
+@RestController
+@RequestMapping("scim/v2/Users")
 public class UserResourceImpl extends BaseResourceTypeResourceImpl<ScimUser> implements UserResource {
 
   @Inject

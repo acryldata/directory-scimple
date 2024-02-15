@@ -46,6 +46,12 @@ import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWra
 import org.apache.directory.scim.spec.resources.ScimResource;
 import org.apache.directory.scim.spec.resources.ScimUser;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.WebRequest;
 
 import static jakarta.ws.rs.core.MediaType.*;
@@ -71,7 +77,7 @@ import static org.apache.directory.scim.protocol.Constants.SCIM_CONTENT_TYPE;
  */
 //@formatter:on
 
-@Path(SelfResource.PATH)
+@RequestMapping(SelfResource.PATH)
 @Tag(name="SCIM")
 public interface SelfResource {
 
@@ -83,7 +89,7 @@ public interface SelfResource {
    * @return
    * @throws UnableToRetrieveResourceException 
    */
-  @GET
+  @GetMapping
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description="Get self record")
   @ApiResponses(value={
@@ -104,7 +110,7 @@ public interface SelfResource {
    *      query resources</a>
    * @return
    */
-  @POST
+  @PostMapping
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description = "Create self record")
@@ -129,7 +135,7 @@ public interface SelfResource {
    *      update</a>
    * @return
    */
-  @PUT
+  @PutMapping
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description = "Update self record")
@@ -139,15 +145,15 @@ public interface SelfResource {
     @ApiResponse(responseCode = "400", description = "Bad Request"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response update(WebRequest request, @RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
+  default ResponseEntity<? extends ScimResource> update(WebRequest request, @RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = ScimUser.class)),
                                        required = true) ScimUser resource,
                           @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
                           @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
-  @PATCH
+  @PatchMapping
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description = "Patch a portion of the backing store")
@@ -159,15 +165,15 @@ public interface SelfResource {
     @ApiResponse(responseCode = "404", description = "Not found"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response patch(WebRequest request, @RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
+  default ResponseEntity<? extends ScimResource> patch(WebRequest request, @RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                                       schema = @Schema(implementation = PatchRequest.class)),
                                       required = true) PatchRequest patchRequest,
                          @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
                          @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
-  @DELETE
+  @DeleteMapping
   @Operation(description = "Delete self record")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "No Content"),
@@ -175,7 +181,7 @@ public interface SelfResource {
     @ApiResponse(responseCode = "404", description = "Not found"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response delete() throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+  default ResponseEntity<? extends ScimResource> delete() throws ScimException, ResourceException {
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 }
