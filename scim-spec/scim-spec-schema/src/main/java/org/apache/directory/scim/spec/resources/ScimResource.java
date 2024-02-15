@@ -22,6 +22,7 @@ package org.apache.directory.scim.spec.resources;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.apache.directory.scim.spec.annotation.ScimAttribute;
 import org.apache.directory.scim.spec.annotation.ScimExtensionType;
 import org.apache.directory.scim.spec.annotation.ScimResourceType;

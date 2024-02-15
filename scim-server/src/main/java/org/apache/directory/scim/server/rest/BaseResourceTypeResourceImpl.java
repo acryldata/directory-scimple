@@ -24,7 +24,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.enterprise.inject.spi.CDI;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.Response.Status.Family;
@@ -184,7 +183,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   @Override
   public ResponseEntity<T> create(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
     schema = @Schema(implementation = ScimResource.class)),
-    required = true) T resource,
+    required = true) @org.springframework.web.bind.annotation.RequestBody T resource,
     @Parameter(name="attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
     @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     Repository<T> repository = getRepositoryInternal();
@@ -215,7 +214,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   @Override
   public ResponseEntity<ListResponse<T>> find(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
     schema = @Schema(implementation = SearchRequest.class)),
-    required = true) SearchRequest request) throws ScimException, ResourceException {
+    required = true) @org.springframework.web.bind.annotation.RequestBody SearchRequest request) throws ScimException, ResourceException {
     Repository<T> repository = getRepositoryInternal();
 
     Set<AttributeReference> attributeReferences = Optional.ofNullable(request.getAttributes())
@@ -268,7 +267,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   public ResponseEntity<T> update(WebRequest request,
     @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
       schema = @Schema(implementation = ScimResource.class)),
-      required = true) T resource,
+      required = true) @org.springframework.web.bind.annotation.RequestBody T resource,
     @PathVariable("id") String id,
     @Parameter(name="attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
     @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
@@ -279,7 +278,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   @Override
   public ResponseEntity<T> patch(WebRequest request, @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
     schema = @Schema(implementation = PatchRequest.class)),
-    required = true) PatchRequest patchRequest,
+    required = true) @org.springframework.web.bind.annotation.RequestBody PatchRequest patchRequest,
     @PathVariable("id") String id,
     @Parameter(name="attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
     @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {

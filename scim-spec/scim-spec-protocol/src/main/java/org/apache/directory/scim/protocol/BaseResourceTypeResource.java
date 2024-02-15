@@ -127,7 +127,7 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
   default ResponseEntity<T> create(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = ScimResource.class)),
-                                       required = true) T resource,
+                                       required = true) @org.springframework.web.bind.annotation.RequestBody T resource,
                           @Parameter(name="attributes") @RequestParam(name = "attributes") AttributeReferenceListWrapper attributes,
                           @Parameter(name="excludedAttributes") @RequestParam(name = "excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
@@ -149,7 +149,7 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
   default ResponseEntity<ListResponse<T>> find(@RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                      schema = @Schema(implementation = SearchRequest.class)),
-                                     required = true) SearchRequest request) throws ScimException, ResourceException {
+                                     required = true) @org.springframework.web.bind.annotation.RequestBody SearchRequest request) throws ScimException, ResourceException {
     return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
@@ -172,7 +172,7 @@ public interface BaseResourceTypeResource<T> {
     WebRequest request,
     @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = ScimResource.class)),
-                                       required = true) T resource,
+                                       required = true) @org.springframework.web.bind.annotation.RequestBody T resource,
                           @PathVariable("id") String id,
                           @Parameter(name="attributes") @RequestParam("attributes") AttributeReferenceListWrapper attributes,
                           @Parameter(name="excludedAttributes") @RequestParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
@@ -191,7 +191,7 @@ public interface BaseResourceTypeResource<T> {
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
   default ResponseEntity<T> patch(WebRequest request, @RequestBody(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
                                       schema = @Schema(implementation = PatchRequest.class)),
-                                      required = true) PatchRequest patchRequest,
+                                      required = true) @org.springframework.web.bind.annotation.RequestBody PatchRequest patchRequest,
                          @PathVariable("id") String id,
                          @Parameter(name="attributes") @RequestParam("attributes") AttributeReferenceListWrapper attributes,
                          @Parameter(name="excludedAttributes") @RequestParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
