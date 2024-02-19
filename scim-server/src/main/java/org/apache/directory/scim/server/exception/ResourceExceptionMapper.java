@@ -27,6 +27,8 @@ import org.apache.directory.scim.protocol.Constants;
 import org.apache.directory.scim.protocol.ErrorMessageType;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
 import org.apache.directory.scim.spec.exception.ResourceException;
+import org.springframework.http.HttpStatus;
+
 
 @Provider
 @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
@@ -34,10 +36,10 @@ public class ResourceExceptionMapper extends BaseScimExceptionMapper<ResourceExc
 
   @Override
   protected ErrorResponse errorResponse(ResourceException e) {
-    Status status = Status.fromStatusCode(e.getStatus());
+    HttpStatus status = HttpStatus.valueOf(e.getStatus());
     ErrorResponse errorResponse = new ErrorResponse(status, e.getMessage());
 
-    if (status == Status.CONFLICT) {
+    if (status == HttpStatus.CONFLICT) {
       errorResponse.setScimType(ErrorMessageType.UNIQUENESS);
 
       //only use default error message if the ErrorResponse does not already contain a message

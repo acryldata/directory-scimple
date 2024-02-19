@@ -24,6 +24,8 @@ import jakarta.ws.rs.core.Response.Status;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.http.HttpStatus;
+
 
 @Data
 @EqualsAndHashCode(callSuper=true)
@@ -31,19 +33,19 @@ public class ScimException extends Exception {
 
   private static final long serialVersionUID = 3643485564325176463L;
   private final ErrorResponse error;
-  private final Status status;
+  private final HttpStatus status;
 
-  public ScimException(Status status, String message, Throwable cause) {
+  public ScimException(HttpStatus status, String message, Throwable cause) {
     super(message, cause);
     this.error = new ErrorResponse(status, message);
     this.status = status;
   }
 
-  public ScimException(Status status, String message) {
+  public ScimException(HttpStatus status, String message) {
     this(new ErrorResponse(status, message), status);
   }
 
-  public ScimException(ErrorResponse error, Status status) {
+  public ScimException(ErrorResponse error, HttpStatus status) {
     this.error = error;
     this.status = status;
   }

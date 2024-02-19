@@ -32,6 +32,7 @@ import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
 import org.apache.directory.scim.spec.patch.PatchOperation;
 import org.apache.directory.scim.spec.resources.ScimExtension;
 import org.apache.directory.scim.spec.resources.ScimGroup;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -84,7 +85,7 @@ public class InMemoryGroupService implements Repository<ScimGroup> {
       .anyMatch(group -> resource.getExternalId().equals(group.getExternalId()));
     if (existingGroupFound) {
       // HTTP leaking into data layer
-      throw new UnableToCreateResourceException(Response.Status.CONFLICT, "Group '" + resource.getExternalId() + "' already exists.");
+      throw new UnableToCreateResourceException(HttpStatus.CONFLICT, "Group '" + resource.getExternalId() + "' already exists.");
     }
 
     resource.setId(id);

@@ -38,7 +38,7 @@ public class EtagGenerator {
 
   private final ObjectMapper objectMapper = ObjectMapperFactory.getObjectMapper();
 
-  public EntityTag generateEtag(ScimResource resource) throws EtagGenerationException {
+  public String generateEtag(ScimResource resource) throws EtagGenerationException {
 
     try {
       Meta meta = resource.getMeta();
@@ -50,8 +50,9 @@ public class EtagGenerator {
       resource.setMeta(null);
       String writeValueAsString = objectMapper.writeValueAsString(resource);
 
-      EntityTag etag = hash(writeValueAsString);
-      meta.setVersion(etag.getValue());
+      String etag = hash(writeValueAsString);
+
+      meta.setVersion(etag);
 
       resource.setMeta(meta);
 
@@ -61,10 +62,10 @@ public class EtagGenerator {
     }
   }
   
-  private static EntityTag hash(String input) throws NoSuchAlgorithmException {
+  private static String hash(String input) throws NoSuchAlgorithmException {
     MessageDigest digest = MessageDigest.getInstance("SHA-256");
     digest.update(input.getBytes(StandardCharsets.UTF_8));
     byte[] hash = digest.digest();
-    return new EntityTag(Base64.getEncoder().encodeToString(hash));
+    return Base64.getEncoder().encodeToString(hash);
   }
 }

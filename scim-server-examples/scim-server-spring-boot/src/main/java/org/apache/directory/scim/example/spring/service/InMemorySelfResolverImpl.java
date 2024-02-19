@@ -25,6 +25,7 @@ import org.apache.directory.scim.server.exception.UnableToResolveIdResourceExcep
 import java.security.Principal;
 
 import jakarta.ws.rs.core.Response.Status;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,6 +33,6 @@ public class InMemorySelfResolverImpl implements SelfIdResolver {
 
   @Override
   public String resolveToInternalId(Principal principal) throws UnableToResolveIdResourceException {
-    throw new UnableToResolveIdResourceException(Status.NOT_IMPLEMENTED, "Caller Principal not available");
+    throw new UnableToResolveIdResourceException(HttpStatus.NOT_IMPLEMENTED, "Caller Principal not available");
   }
 }

@@ -23,13 +23,19 @@ import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
+import lombok.SneakyThrows;
 import org.apache.directory.scim.protocol.ErrorMessageType;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
+import org.apache.directory.scim.protocol.exception.ScimException;
 import org.apache.directory.scim.spec.filter.FilterParseException;
 import org.apache.directory.scim.spec.filter.Filter;
 
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
+
 
 @Slf4j
 @Data
@@ -37,16 +43,16 @@ final public class FilterWrapper {
 
   final public Filter filter;
   
-  public FilterWrapper(String string) {
+  public FilterWrapper(String string) throws ScimException {
     
     try {
       filter = new Filter(string);
     } catch (FilterParseException e) {
       log.error("Invalid Filter: {}", string);
-      ErrorResponse er = new ErrorResponse(Status.BAD_REQUEST, ErrorMessageType.INVALID_FILTER.getDetail());
+      ErrorResponse er = new ErrorResponse(HttpStatus.BAD_REQUEST, ErrorMessageType.INVALID_FILTER.getDetail());
       er.setScimType(ErrorMessageType.INVALID_FILTER);
-      Response response = er.toResponse();
-      throw new WebApplicationException(e, response);
+      ResponseEntity<ErrorResponse> response = er.toResponseEntity();
+      throw new ScimException(er, er.getStatus());
     }
   }
 

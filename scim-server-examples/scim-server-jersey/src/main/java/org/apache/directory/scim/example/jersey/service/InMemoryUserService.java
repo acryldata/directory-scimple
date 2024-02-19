@@ -47,6 +47,8 @@ import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
 import org.apache.directory.scim.spec.patch.PatchOperation;
 import org.apache.directory.scim.spec.resources.*;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.springframework.http.HttpStatus;
+
 
 /**
  * Creates a singleton (effectively) Repository<ScimUser> with a memory-based
@@ -128,7 +130,7 @@ public class InMemoryUserService implements Repository<ScimUser> {
       .anyMatch(user -> user.getUserName().equals(resource.getUserName()));
     if (existingUserFound) {
       // HTTP leaking into data layer
-      throw new UnableToCreateResourceException(Response.Status.CONFLICT, "User '" + resource.getUserName() + "' already exists.");
+      throw new UnableToCreateResourceException(HttpStatus.CONFLICT, "User '" + resource.getUserName() + "' already exists.");
     }
 
     resource.setId(id);

@@ -25,6 +25,9 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import org.apache.directory.scim.protocol.Constants;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 
 @Provider
 @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
@@ -32,6 +35,6 @@ public class GenericExceptionMapper extends BaseScimExceptionMapper<Throwable> {
 
   @Override
   protected ErrorResponse errorResponse(Throwable throwable) {
-    return new ErrorResponse(Response.Status.INTERNAL_SERVER_ERROR, throwable.getMessage());
+    return new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, throwable.getMessage());
   }
 }

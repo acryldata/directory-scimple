@@ -38,6 +38,7 @@ import org.apache.directory.scim.protocol.exception.ScimException;
 import org.apache.directory.scim.spec.resources.ScimResource;
 import org.apache.directory.scim.spec.resources.ScimUser;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.context.request.WebRequest;
 
@@ -104,11 +105,11 @@ public class SelfResourceImpl implements SelfResource {
     if (callerPrincipal != null) {
       log.debug("Resolved SelfResource principal to : {}", callerPrincipal.getName());
     } else {
-      throw new UnableToResolveIdResourceException(Status.UNAUTHORIZED, "Unauthorized");
+      throw new UnableToResolveIdResourceException(HttpStatus.UNAUTHORIZED, "Unauthorized");
     }
 
     if (selfIdResolver.isUnsatisfied()) {
-      throw new UnableToResolveIdResourceException(Status.NOT_IMPLEMENTED, "Caller SelfIdResolver not available");
+      throw new UnableToResolveIdResourceException(HttpStatus.NOT_IMPLEMENTED, "Caller SelfIdResolver not available");
     }
 
     return selfIdResolver.get().resolveToInternalId(callerPrincipal);

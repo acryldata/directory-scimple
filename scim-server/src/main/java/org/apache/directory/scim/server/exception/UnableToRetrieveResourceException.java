@@ -24,6 +24,8 @@ import jakarta.ws.rs.core.Response.Status;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.directory.scim.spec.exception.ResourceException;
+import org.springframework.http.HttpStatus;
+
 
 @Data
 @EqualsAndHashCode(callSuper=true)
@@ -31,11 +33,11 @@ public class UnableToRetrieveResourceException extends ResourceException {
 
   private static final long serialVersionUID = -3872700870424005641L;
 
-  public UnableToRetrieveResourceException(Status status, String message) {
-    super(status.getStatusCode(), message);
+  public UnableToRetrieveResourceException(HttpStatus status, String message) {
+    super(status.value(), message);
   }
 
-  public UnableToRetrieveResourceException(Status status, String message, Throwable cause) {
-    super(status.getStatusCode(), message, cause);
+  public UnableToRetrieveResourceException(HttpStatus status, String message, Throwable cause) {
+    super(status.value(), message, cause);
   }
 }

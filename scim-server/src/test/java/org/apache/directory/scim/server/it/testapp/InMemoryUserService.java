@@ -23,26 +23,30 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.ws.rs.core.Response;
-import org.apache.directory.scim.core.repository.PatchHandler;
-import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
-import org.apache.directory.scim.core.repository.Repository;
-import org.apache.directory.scim.spec.exception.ResourceException;
-import org.apache.directory.scim.spec.filter.FilterExpressions;
-import org.apache.directory.scim.spec.filter.FilterResponse;
-import org.apache.directory.scim.spec.filter.Filter;
-import org.apache.directory.scim.spec.filter.PageRequest;
-import org.apache.directory.scim.spec.filter.SortRequest;
-import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
-import org.apache.directory.scim.spec.patch.PatchOperation;
-import org.apache.directory.scim.spec.resources.*;
-import org.apache.directory.scim.core.schema.SchemaRegistry;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.apache.directory.scim.core.repository.PatchHandler;
+import org.apache.directory.scim.core.repository.Repository;
+import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
+import org.apache.directory.scim.spec.exception.ResourceException;
+import org.apache.directory.scim.spec.filter.Filter;
+import org.apache.directory.scim.spec.filter.FilterExpressions;
+import org.apache.directory.scim.spec.filter.FilterResponse;
+import org.apache.directory.scim.spec.filter.PageRequest;
+import org.apache.directory.scim.spec.filter.SortRequest;
+import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
+import org.apache.directory.scim.spec.patch.PatchOperation;
+import org.apache.directory.scim.spec.resources.Email;
+import org.apache.directory.scim.spec.resources.Name;
+import org.apache.directory.scim.spec.resources.ScimExtension;
+import org.apache.directory.scim.spec.resources.ScimResource;
+import org.apache.directory.scim.spec.resources.ScimUser;
+import org.springframework.http.HttpStatus;
+
 
 /**
  * Creates a singleton (effectively) Repository<ScimUser> with a memory-based
@@ -121,7 +125,7 @@ public class InMemoryUserService implements Repository<ScimUser> {
       .anyMatch(user -> user.getUserName().equals(resource.getUserName()));
     if (existingUserFound) {
       // HTTP leaking into data layer
-      throw new UnableToCreateResourceException(Response.Status.CONFLICT, "User '" + resource.getUserName() + "' already exists.");
+      throw new UnableToCreateResourceException(HttpStatus.CONFLICT, "User '" + resource.getUserName() + "' already exists.");
     }
 
     resource.setId(id);

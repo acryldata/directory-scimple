@@ -33,6 +33,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.io.Serializable;
+import org.springframework.http.HttpOutputMessage;
+import org.springframework.http.HttpStatus;
+
 
 @Data
 @XmlType(propOrder = {"method","path","bulkId","data"})
@@ -55,13 +58,13 @@ public class BulkOperation implements Serializable {
 
     private static final long serialVersionUID = 1544738718748608248L;
 
-    public static StatusWrapper wrap(Status code) {
+    public static StatusWrapper wrap(HttpStatus code) {
       return new StatusWrapper(code);
     }
     
     @XmlElement
     @XmlJavaTypeAdapter(StatusAdapter.class)
-    Status code;
+    HttpStatus code;
   }
 
   @XmlElement

@@ -25,6 +25,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.Provider;
 import org.apache.directory.scim.protocol.Constants;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
+import org.springframework.http.HttpStatus;
+
 
 @Provider
 @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
@@ -32,6 +34,6 @@ public class UnsupportedOperationExceptionMapper extends BaseScimExceptionMapper
 
   @Override
   protected ErrorResponse errorResponse(UnsupportedOperationException throwable) {
-    return new ErrorResponse(Response.Status.NOT_IMPLEMENTED, throwable.getMessage());
+    return new ErrorResponse(HttpStatus.NOT_IMPLEMENTED, throwable.getMessage());
   }
 }

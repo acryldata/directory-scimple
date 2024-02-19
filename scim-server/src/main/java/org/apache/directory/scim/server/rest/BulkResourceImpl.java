@@ -49,6 +49,8 @@ import org.apache.directory.scim.spec.schema.Schema;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.springframework.http.HttpStatus;
+
 
 @Slf4j
 @ApplicationScoped
@@ -139,11 +141,11 @@ public class BulkResourceImpl implements BulkResource {
           errorOccurred = true;
           BulkOperation duplicateOperation = bulkIdKeyToOperationResult.get(bulkIdKey);
 
-          createAndSetErrorResponse(operationRequest, Status.CONFLICT, "Duplicate bulkId");
+          createAndSetErrorResponse(operationRequest, HttpStatus.CONFLICT, "Duplicate bulkId");
 
           if (!(duplicateOperation.getResponse() instanceof ErrorResponse)) {
             duplicateOperation.setData(null);
-            createAndSetErrorResponse(duplicateOperation, Status.CONFLICT, "Duplicate bulkId");
+            createAndSetErrorResponse(duplicateOperation, HttpStatus.CONFLICT, "Duplicate bulkId");
           }
         }
       }
@@ -155,7 +157,7 @@ public class BulkResourceImpl implements BulkResource {
           if (operationRequest.getData() == null) {
             errorOccurred = true;
 
-            createAndSetErrorResponse(operationRequest, Status.BAD_REQUEST, "data not provided");
+            createAndSetErrorResponse(operationRequest, HttpStatus.BAD_REQUEST, "data not provided");
           }
         }
           break;
@@ -166,12 +168,12 @@ public class BulkResourceImpl implements BulkResource {
           if (path == null) {
             errorOccurred = true;
 
-            createAndSetErrorResponse(operationRequest, Status.BAD_REQUEST, "path not provided");
+            createAndSetErrorResponse(operationRequest, HttpStatus.BAD_REQUEST, "path not provided");
           } else if (!PATH_PATTERN.matcher(path)
                                   .matches()) {
             errorOccurred = true;
 
-            createAndSetErrorResponse(operationRequest, Status.BAD_REQUEST, "path is not a valid path (e.g. \"/Groups/123abc\", \"/Users/123xyz\", ...)");
+            createAndSetErrorResponse(operationRequest, HttpStatus.BAD_REQUEST, "path is not a valid path (e.g. \"/Groups/123abc\", \"/Users/123xyz\", ...)");
           } else {
             String endPoint = path.substring(0, path.lastIndexOf('/'));
             Class<ScimResource> clazz = (Class<ScimResource>) schemaRegistry.getScimResourceClassFromEndpoint(endPoint);
@@ -179,7 +181,7 @@ public class BulkResourceImpl implements BulkResource {
             if (clazz == null) {
               errorOccurred = true;
 
-              createAndSetErrorResponse(operationRequest, Status.BAD_REQUEST, "path does not contain a recognized endpoint (e.g. \"/Groups/...\", \"/Users/...\", ...)");
+              createAndSetErrorResponse(operationRequest, HttpStatus.BAD_REQUEST, "path does not contain a recognized endpoint (e.g. \"/Groups/...\", \"/Users/...\", ...)");
             }
           }
         }
@@ -188,7 +190,7 @@ public class BulkResourceImpl implements BulkResource {
         case PATCH: {
           errorOccurred = true;
 
-          createAndSetErrorResponse(operationRequest, Status.NOT_IMPLEMENTED, "Method not implemented: PATCH");
+          createAndSetErrorResponse(operationRequest, HttpStatus.NOT_IMPLEMENTED, "Method not implemented: PATCH");
         }
           break;
 
@@ -200,7 +202,7 @@ public class BulkResourceImpl implements BulkResource {
         errorOccurred = true;
 
         operationRequest.setData(null);
-        createAndSetErrorResponse(operationRequest, Status.BAD_REQUEST, "no method provided (e.g. PUT, POST, ...");
+        createAndSetErrorResponse(operationRequest, HttpStatus.BAD_REQUEST, "no method provided (e.g. PUT, POST, ...");
       }
       if (errorOccurred) {
         operationRequest.setData(null);
@@ -214,7 +216,7 @@ public class BulkResourceImpl implements BulkResource {
 
             if (!(dependentOperation.getResponse() instanceof ErrorResponse)) {
               dependentOperation.setData(null);
-              createAndSetErrorResponse(dependentOperation, Status.CONFLICT, detail);
+              createAndSetErrorResponse(dependentOperation, HttpStatus.CONFLICT, detail);
             }
           }
         }
@@ -250,7 +252,7 @@ public class BulkResourceImpl implements BulkResource {
           errorCount += errorCountIncrement;
           String detail = unresolvableOperationException.getLocalizedMessage();
 
-          createAndSetErrorResponse(operationResult, Status.CONFLICT, detail);
+          createAndSetErrorResponse(operationResult, HttpStatus.CONFLICT, detail);
 
           if (operationResult.getBulkId() != null) {
             String bulkIdKey = "bulkId:" + operationResult.getBulkId();
@@ -263,7 +265,7 @@ public class BulkResourceImpl implements BulkResource {
 
         // continue processing bulk operations to cleanup any dependencies
 
-        createAndSetErrorResponse(operationResult, Status.CONFLICT, "failOnErrors count reached");
+        createAndSetErrorResponse(operationResult, HttpStatus.CONFLICT, "failOnErrors count reached");
         if (operationResult.getBulkId() != null) {
           String bulkIdKey = "bulkId:" + operationResult.getBulkId();
 
@@ -295,7 +297,7 @@ public class BulkResourceImpl implements BulkResource {
 
         bulkOperationResult.setData(null);
         bulkOperationResult.setLocation(null);
-        createAndSetErrorResponse(bulkOperationResult, Status.CONFLICT, detail);
+        createAndSetErrorResponse(bulkOperationResult, HttpStatus.CONFLICT, detail);
         this.cleanup(bulkIdKey, transitiveReverseDependencies, bulkIdKeyToOperationResult);
       } catch (UnableToUpdateResourceException unableToUpdateResourceException) {
         log.error("Failed to update Scim Resource with resolved bulkIds", unableToUpdateResourceException);
@@ -313,7 +315,7 @@ public class BulkResourceImpl implements BulkResource {
 
         bulkOperationResult.setData(null);
         bulkOperationResult.setLocation(null);
-        createAndSetErrorResponse(bulkOperationResult, Status.NOT_FOUND, detail);
+        createAndSetErrorResponse(bulkOperationResult, HttpStatus.NOT_FOUND, detail);
         this.cleanup(bulkIdKey, transitiveReverseDependencies, bulkIdKeyToOperationResult);
       }
     }
@@ -366,7 +368,7 @@ public class BulkResourceImpl implements BulkResource {
 
           dependentOperationResult.setData(null);
           dependentOperationResult.setLocation(null);
-          createAndSetErrorResponse(dependentOperationResult, Status.CONFLICT, String.format(OPERATION_DEPENDS_ON_FAILED_OPERATION, bulkId, dependentBulkIdKey));
+          createAndSetErrorResponse(dependentOperationResult, HttpStatus.CONFLICT, String.format(OPERATION_DEPENDS_ON_FAILED_OPERATION, bulkId, dependentBulkIdKey));
           dependentResourceRepository.delete(dependentResourceId);
         } catch (ResourceException unableToDeleteResourceException) {
           log.error("Could not delete depenedent ScimResource after failing to update dependee", unableToDeleteResourceException);
@@ -433,7 +435,7 @@ public class BulkResourceImpl implements BulkResource {
       operationResult.setData(newScimResource);
       operationResult.setLocation(newResourceUri);
       operationResult.setPath(null);
-      operationResult.setStatus(StatusWrapper.wrap(Status.CREATED));
+      operationResult.setStatus(StatusWrapper.wrap(HttpStatus.CREATED));
     }
       break;
 
@@ -446,7 +448,7 @@ public class BulkResourceImpl implements BulkResource {
                                                  + 1);
 
       repository.delete(scimResourceId);
-      operationResult.setStatus(StatusWrapper.wrap(Status.NO_CONTENT));
+      operationResult.setStatus(StatusWrapper.wrap(HttpStatus.NO_CONTENT));
     }
       break;
 
@@ -461,9 +463,9 @@ public class BulkResourceImpl implements BulkResource {
 
       try {
         repository.update(id, null, scimResource, Collections.emptySet(), Collections.emptySet());
-        operationResult.setStatus(StatusWrapper.wrap(Status.OK));
+        operationResult.setStatus(StatusWrapper.wrap(HttpStatus.OK));
       } catch (UnableToRetrieveResourceException e) {
-        operationResult.setStatus(StatusWrapper.wrap(Status.NOT_FOUND));
+        operationResult.setStatus(StatusWrapper.wrap(HttpStatus.NOT_FOUND));
       }
     }
       break;
@@ -473,17 +475,17 @@ public class BulkResourceImpl implements BulkResource {
       String detail = "Method not allowed: " + method;
 
       log.error("Received unallowed method: {}", method);
-      createAndSetErrorResponse(operationResult, Status.METHOD_NOT_ALLOWED, detail);
+      createAndSetErrorResponse(operationResult, HttpStatus.METHOD_NOT_ALLOWED, detail);
     }
       break;
     }
   }
 
   private static void createAndSetErrorResponse(BulkOperation operationResult, int statusCode, String detail) {
-    createAndSetErrorResponse(operationResult, Status.fromStatusCode(statusCode), detail);
+    createAndSetErrorResponse(operationResult, HttpStatus.valueOf(statusCode), detail);
   }
 
-  private static void createAndSetErrorResponse(BulkOperation operationResult, Status status, String detail) {
+  private static void createAndSetErrorResponse(BulkOperation operationResult, HttpStatus status, String detail) {
     ErrorResponse error = new ErrorResponse(status, detail);
     operationResult.setResponse(error);
     operationResult.setStatus(new StatusWrapper(status));

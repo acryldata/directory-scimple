@@ -28,6 +28,8 @@ import org.apache.directory.scim.protocol.Constants;
 import org.apache.directory.scim.protocol.ErrorMessageType;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
 import org.apache.directory.scim.spec.filter.FilterParseException;
+import org.springframework.http.HttpStatus;
+
 
 @Provider
 @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
@@ -35,7 +37,7 @@ public class FilterParseExceptionMapper extends BaseScimExceptionMapper<FilterPa
 
   @Override
   protected ErrorResponse errorResponse(FilterParseException exception) {
-    return new ErrorResponse(Status.BAD_REQUEST, exception.getMessage())
+    return new ErrorResponse(HttpStatus.BAD_REQUEST, exception.getMessage())
       .setScimType(ErrorMessageType.INVALID_FILTER);
   }
 }

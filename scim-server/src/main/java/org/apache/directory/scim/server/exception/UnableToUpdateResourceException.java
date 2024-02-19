@@ -19,11 +19,11 @@
 
 package org.apache.directory.scim.server.exception;
 
-import jakarta.ws.rs.core.Response.Status;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.directory.scim.spec.exception.ResourceException;
+import org.springframework.http.HttpStatus;
+
 
 @Data
 @EqualsAndHashCode(callSuper=true)
@@ -31,11 +31,11 @@ public class UnableToUpdateResourceException extends ResourceException {
 
   private static final long serialVersionUID = -3872700870424005641L;
 
-  public UnableToUpdateResourceException(Status status, String message) {
-    super(status.getStatusCode(), message);
+  public UnableToUpdateResourceException(HttpStatus status, String message) {
+    super(status.value(), message);
   }
 
-  public UnableToUpdateResourceException(Status status, String message, Throwable cause) {
-    super(status.getStatusCode(), message, cause);
+  public UnableToUpdateResourceException(HttpStatus status, String message, Throwable cause) {
+    super(status.value(), message, cause);
   }
 }

@@ -19,15 +19,13 @@
 
 package org.apache.directory.scim.server.rest;
 
+import jakarta.ws.rs.core.HttpHeaders;
 import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.EntityTag;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
-import jakarta.ws.rs.core.Response.Status;
 
 import org.apache.directory.scim.server.configuration.ServerConfiguration;
 import org.apache.directory.scim.protocol.ServiceProviderConfigResource;
@@ -39,6 +37,9 @@ import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration.Authen
 import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration.BulkConfiguration;
 import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration.FilterConfiguration;
 import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration.SupportedConfiguration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 
 @ApplicationScoped
 public class ServiceProviderConfigResourceImpl implements ServiceProviderConfigResource {
@@ -59,7 +60,7 @@ public class ServiceProviderConfigResourceImpl implements ServiceProviderConfigR
   }
 
   @Override
-  public Response getServiceProviderConfiguration(UriInfo uriInfo) {
+  public ResponseEntity getServiceProviderConfiguration(UriInfo uriInfo) {
     ServiceProviderConfiguration serviceProviderConfiguration = new ServiceProviderConfiguration();
     List<AuthenticationSchema> authenticationSchemas = serverConfiguration.getAuthenticationSchemas();
     BulkConfiguration bulk = serverConfiguration.getBulkConfiguration();
@@ -93,15 +94,15 @@ public class ServiceProviderConfigResourceImpl implements ServiceProviderConfigR
     serviceProviderConfiguration.setSort(sort);
     
     try {
-      EntityTag etag = etagGenerator.generateEtag(serviceProviderConfiguration);
-      return Response.ok(serviceProviderConfiguration).tag(etag).build();
+      String etag = etagGenerator.generateEtag(serviceProviderConfiguration);
+      return ResponseEntity.ok().header(HttpHeaders.ETAG, etag).body(serviceProviderConfiguration);
     } catch (EtagGenerationException e) {
       return createETagErrorResponse();
     }
   }
   
-  private Response createETagErrorResponse() {
-    ErrorResponse er = new ErrorResponse(Status.INTERNAL_SERVER_ERROR, "Failed to generate the etag");
-    return er.toResponse();
+  private ResponseEntity<ErrorResponse> createETagErrorResponse() {
+    ErrorResponse er = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to generate the etag");
+    return er.toResponseEntity();
   }
 }

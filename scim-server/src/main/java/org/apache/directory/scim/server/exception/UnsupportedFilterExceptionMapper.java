@@ -23,12 +23,14 @@ import jakarta.ws.rs.core.Response;
 import org.apache.directory.scim.protocol.ErrorMessageType;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
 import org.apache.directory.scim.spec.exception.UnsupportedFilterException;
+import org.springframework.http.HttpStatus;
+
 
 public class UnsupportedFilterExceptionMapper extends BaseScimExceptionMapper<UnsupportedFilterException> {
 
   @Override
   protected ErrorResponse errorResponse(UnsupportedFilterException throwable) {
-    return new ErrorResponse(Response.Status.BAD_REQUEST, ErrorMessageType.INVALID_FILTER.getDetail())
+    return new ErrorResponse(HttpStatus.BAD_REQUEST, ErrorMessageType.INVALID_FILTER.getDetail())
       .setScimType(ErrorMessageType.INVALID_FILTER);
   }
 }

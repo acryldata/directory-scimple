@@ -23,32 +23,29 @@ import jakarta.enterprise.inject.Instance;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriBuilder;
 import jakarta.ws.rs.core.UriInfo;
-import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
-import org.apache.directory.scim.core.repository.Repository;
-import org.apache.directory.scim.core.repository.RepositoryRegistry;
-import org.apache.directory.scim.protocol.data.BulkOperation;
-import org.apache.directory.scim.protocol.data.BulkRequest;
-import org.apache.directory.scim.protocol.data.BulkResponse;
-import org.apache.directory.scim.protocol.data.ErrorResponse;
-import org.apache.directory.scim.spec.resources.GroupMembership;
-import org.apache.directory.scim.spec.resources.ScimGroup;
-import org.apache.directory.scim.spec.resources.ScimResource;
-import org.apache.directory.scim.spec.resources.ScimUser;
-import org.apache.directory.scim.core.schema.SchemaRegistry;
-import org.junit.jupiter.api.Test;
-import org.mockito.InOrder;
-
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
+import org.apache.directory.scim.core.repository.Repository;
+import org.apache.directory.scim.core.repository.RepositoryRegistry;
+import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.apache.directory.scim.protocol.data.BulkOperation;
+import org.apache.directory.scim.protocol.data.BulkRequest;
+import org.apache.directory.scim.protocol.data.BulkResponse;
+import org.apache.directory.scim.protocol.data.ErrorResponse;
+import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
+import org.apache.directory.scim.spec.resources.GroupMembership;
+import org.apache.directory.scim.spec.resources.ScimGroup;
+import org.apache.directory.scim.spec.resources.ScimResource;
+import org.apache.directory.scim.spec.resources.ScimUser;
+import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
+import org.springframework.http.HttpStatus;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 public class BulkResourceImplTest {
 
@@ -126,14 +123,14 @@ public class BulkResourceImplTest {
         .setData(new ScimUser()
           .setId("alice-id"))
         .setLocation("https://scim.example.com/Users/alice-id")
-        .setStatus(new BulkOperation.StatusWrapper(Response.Status.CREATED)))
+        .setStatus(new BulkOperation.StatusWrapper(HttpStatus.CREATED)))
       .contains(new BulkOperation()
         .setMethod(BulkOperation.Method.POST)
         .setBulkId("ytrewq")
         .setData(new ScimGroup()
           .setId("tour-guides"))
         .setLocation("https://scim.example.com/Groups/tour-guides")
-        .setStatus(new BulkOperation.StatusWrapper(Response.Status.CREATED)));
+        .setStatus(new BulkOperation.StatusWrapper(HttpStatus.CREATED)));
 
     // Verify behavior
     InOrder inOrder = inOrder(userRepository, groupRepository);
@@ -188,7 +185,7 @@ public class BulkResourceImplTest {
 
     when(userRepository.create(any()))
       .thenReturn(userAlice)
-      .thenThrow(new UnableToCreateResourceException(Response.Status.BAD_REQUEST, "Expected Test Exception when bob is created"));
+      .thenThrow(new UnableToCreateResourceException(HttpStatus.BAD_REQUEST, "Expected Test Exception when bob is created"));
 
 
     BulkResourceImpl impl = new BulkResourceImpl(schemaRegistry, repositoryRegistry);
@@ -216,11 +213,11 @@ public class BulkResourceImplTest {
         .setData(new ScimUser()
           .setId("alice-id"))
         .setLocation("https://scim.example.com/Users/alice-id")
-        .setStatus(new BulkOperation.StatusWrapper(Response.Status.CREATED)))
+        .setStatus(new BulkOperation.StatusWrapper(HttpStatus.CREATED)))
       .contains(new BulkOperation()
         .setMethod(BulkOperation.Method.POST)
         .setBulkId("bulk-id-bob")
-        .setResponse(new ErrorResponse(Response.Status.BAD_REQUEST, "Expected Test Exception when bob is created"))
-        .setStatus(new BulkOperation.StatusWrapper(Response.Status.BAD_REQUEST)));
+        .setResponse(new ErrorResponse(HttpStatus.BAD_REQUEST, "Expected Test Exception when bob is created"))
+        .setStatus(new BulkOperation.StatusWrapper(HttpStatus.BAD_REQUEST)));
   }
 }

@@ -19,8 +19,6 @@
 
 package org.apache.directory.scim.protocol.data;
 
-import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -31,6 +29,9 @@ import org.apache.directory.scim.protocol.ErrorMessageType;
 import org.apache.directory.scim.spec.resources.BaseResource;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -47,7 +48,7 @@ public class ErrorResponse extends BaseResource<ErrorResponse> {
 
   @XmlElement
   @XmlJavaTypeAdapter(StatusAdapter.class)
-  private Status status;
+  private HttpStatus status;
 
   @XmlElement
   private ErrorMessageType scimType;
@@ -57,20 +58,20 @@ public class ErrorResponse extends BaseResource<ErrorResponse> {
   }
 
   public ErrorResponse(int statusCode, String detail) {
-    this(Status.fromStatusCode(statusCode), detail);
+    this(HttpStatus.valueOf(statusCode), detail);
   }
 
-  public ErrorResponse(Status status, String detail) {
+  public ErrorResponse(HttpStatus status, String detail) {
     this();
     this.status = status;
     this.detail = detail;
   }
 
-  public Response toResponse() {
-    return toResponse(this);
+  public ResponseEntity<ErrorResponse> toResponseEntity() {
+    return toResponseEntity(this);
   }
 
-  public static Response toResponse(ErrorResponse error) {
-    return Response.status(error.status).entity(error).build();
+  public static ResponseEntity<ErrorResponse> toResponseEntity(ErrorResponse error) {
+    return ResponseEntity.status(error.status).body(error);
   }
 }

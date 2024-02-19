@@ -63,6 +63,7 @@ import org.apache.directory.scim.spec.resources.ScimResource;
 import org.apache.directory.scim.spec.schema.Meta;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -94,7 +95,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
   Repository<T> getRepositoryInternal() throws ScimException {
     Repository<T> repository = getRepository();
     if (repository == null) {
-      throw new ScimException(Status.NOT_IMPLEMENTED, "Provider not defined");
+      throw new ScimException(HttpStatus.NOT_IMPLEMENTED, "Provider not defined");
     }
     return repository;
   }
@@ -333,7 +334,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
             resource = (T) attributeFilterExtension.filterAttributes(resource, scimRequestContext);
             log.debug("Resource now - " + resource.toString());
           } catch (ClientFilterException e) {
-            throw new ScimException(Status.fromStatusCode(e.getStatus()), e.getMessage(), e);
+            throw new ScimException(HttpStatus.valueOf(e.getStatus()), e.getMessage(), e);
           }
         }
       }
@@ -381,17 +382,17 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     try {
       return attributesForDisplay(resource, includedAttributes, excludedAttributes);
     } catch (AttributeException e) {
-      throw new ScimException(Status.INTERNAL_SERVER_ERROR, "Failed to parse the attribute query value " + e.getMessage(), e);
+      throw new ScimException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to parse the attribute query value " + e.getMessage(), e);
     }
   }
 
   private ScimException notFoundException(String id) {
-    return new ScimException(Status.NOT_FOUND, "Resource " + id + " not found");
+    return new ScimException(HttpStatus.NOT_FOUND, "Resource " + id + " not found");
   }
 
   private void validateAttributes(Set<AttributeReference> attributeReferences, Set<AttributeReference> excludedAttributeReferences) throws ScimException {
     if (!attributeReferences.isEmpty() && !excludedAttributeReferences.isEmpty()) {
-      throw new ScimException(Status.BAD_REQUEST, "Cannot include both attributes and excluded attributes in a single request");
+      throw new ScimException(HttpStatus.BAD_REQUEST, "Cannot include both attributes and excluded attributes in a single request");
     }
   }
 

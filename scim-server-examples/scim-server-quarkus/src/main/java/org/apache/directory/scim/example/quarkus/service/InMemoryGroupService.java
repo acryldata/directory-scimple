@@ -19,6 +19,7 @@
 
 package org.apache.directory.scim.example.quarkus.service;
 
+import io.netty.handler.codec.http.HttpObject;
 import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.Response;
@@ -48,6 +49,8 @@ import java.util.stream.Collectors;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.springframework.http.HttpStatus;
+
 
 @Named
 @ApplicationScoped
@@ -95,7 +98,7 @@ public class InMemoryGroupService implements Repository<ScimGroup> {
       .anyMatch(group -> resource.getExternalId().equals(group.getExternalId()));
     if (existingGroupFound) {
       // HTTP leaking into data layer
-      throw new UnableToCreateResourceException(Response.Status.CONFLICT, "Group '" + resource.getExternalId() + "' already exists.");
+      throw new UnableToCreateResourceException(HttpStatus.CONFLICT, "Group '" + resource.getExternalId() + "' already exists.");
     }
 
     resource.setId(id);

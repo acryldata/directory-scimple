@@ -24,6 +24,8 @@ import jakarta.ws.rs.core.Response.Status;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.directory.scim.spec.exception.ResourceException;
+import org.springframework.http.HttpStatus;
+
 
 @Data
 @EqualsAndHashCode(callSuper=true)
@@ -31,11 +33,11 @@ public class UnableToResolveIdResourceException extends ResourceException {
 
   private static final long serialVersionUID = -7401709416973728017L;
 
-  public UnableToResolveIdResourceException(Status status, String message) {
-    super(status.getStatusCode(), message);
+  public UnableToResolveIdResourceException(HttpStatus status, String message) {
+    super(status.value(), message);
   }
 
-  public UnableToResolveIdResourceException(Status status, String message, Throwable cause) {
-    super(status.getStatusCode(), message, cause);
+  public UnableToResolveIdResourceException(HttpStatus status, String message, Throwable cause) {
+    super(status.value(), message, cause);
   }
 }
