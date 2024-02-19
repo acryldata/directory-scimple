@@ -52,7 +52,7 @@ final public class FilterWrapper {
       ErrorResponse er = new ErrorResponse(HttpStatus.BAD_REQUEST, ErrorMessageType.INVALID_FILTER.getDetail());
       er.setScimType(ErrorMessageType.INVALID_FILTER);
       ResponseEntity<ErrorResponse> response = er.toResponseEntity();
-      throw new ScimException(er, er.getStatus());
+      throw new ScimException(er, HttpStatus.valueOf(er.getStatus()));
     }
   }
 

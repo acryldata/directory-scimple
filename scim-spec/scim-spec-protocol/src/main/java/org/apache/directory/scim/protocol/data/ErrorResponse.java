@@ -19,6 +19,7 @@
 
 package org.apache.directory.scim.protocol.data;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
@@ -37,6 +38,7 @@ import org.springframework.http.ResponseEntity;
 @EqualsAndHashCode(callSuper = true)
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.NONE)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ErrorResponse extends BaseResource<ErrorResponse> {
 
   private static final long serialVersionUID = 9045421198080348116L;
@@ -48,7 +50,7 @@ public class ErrorResponse extends BaseResource<ErrorResponse> {
 
   @XmlElement
   @XmlJavaTypeAdapter(StatusAdapter.class)
-  private HttpStatus status;
+  private int status;
 
   @XmlElement
   private ErrorMessageType scimType;
@@ -63,7 +65,7 @@ public class ErrorResponse extends BaseResource<ErrorResponse> {
 
   public ErrorResponse(HttpStatus status, String detail) {
     this();
-    this.status = status;
+    this.status = status.value();
     this.detail = detail;
   }
 
