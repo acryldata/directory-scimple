@@ -71,7 +71,7 @@
     <module>scim-tools</module>
     <module>scim-compliance-tests</module>
     <module>scim-test</module>
-    <module>scim-coverage</module>
+<!--    <module>scim-coverage</module>-->
   </modules>
 
   <scm>
