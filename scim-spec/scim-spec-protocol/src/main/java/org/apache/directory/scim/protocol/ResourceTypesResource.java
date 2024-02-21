@@ -33,7 +33,17 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
+import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.spec.schema.ResourceType;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
+
 
 /**
  * From SCIM Protocol Specification, section 4, page 74
@@ -66,26 +76,28 @@ import org.apache.directory.scim.spec.schema.ResourceType;
 @Tag(name="SCIM-Configuration")
 public interface ResourceTypesResource {
 
-  @GET
+  @GET()
+  @GetMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Get All Resource Types")
   @ApiResponse(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
     array = @ArraySchema(schema = @Schema(implementation = ResourceType.class))))
-  default Response getAllResourceTypes(@QueryParam("filter") String filter) throws Exception {
+  default ResponseEntity<ListResponse<ResourceType>> getAllResourceTypes(@QueryParam("filter") @RequestParam(name = "filter", required = false) String filter) throws Exception {
 
     if (filter != null) {
-      return Response.status(Status.FORBIDDEN).build();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 
   @GET
+  @GetMapping(value = "{name}", produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Path("{name}")
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Get Resource Type by URN")
   @ApiResponse(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE, schema = @Schema(implementation = ResourceType.class)))
-  default Response getResourceType(@PathParam("name") String name) throws Exception {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+  default ResponseEntity<ResourceType> getResourceType(@PathParam("name") @PathVariable(name = "name") String name) throws Exception {
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 }

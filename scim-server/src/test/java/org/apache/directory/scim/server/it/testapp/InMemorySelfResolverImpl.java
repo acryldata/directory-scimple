@@ -26,9 +26,11 @@ import org.apache.directory.scim.core.repository.SelfIdResolver;
 
 import java.security.Principal;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 
 @ApplicationScoped
+@org.springframework.stereotype.Repository
 public class InMemorySelfResolverImpl implements SelfIdResolver {
 
   @Override

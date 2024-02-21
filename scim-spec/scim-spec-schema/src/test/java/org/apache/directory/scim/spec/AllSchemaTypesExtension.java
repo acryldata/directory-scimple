@@ -24,6 +24,7 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.directory.scim.spec.annotation.ScimAttribute;
 import org.apache.directory.scim.spec.annotation.ScimExtensionType;
 import org.apache.directory.scim.spec.resources.ScimExtension;
@@ -39,6 +40,7 @@ import java.util.List;
 @XmlRootElement( name = "AllSchemaTypesExtension", namespace = "https://directory.apache.org/scimple/test/extensions" )
 @XmlAccessorType(XmlAccessType.NONE)
 @Data
+@NoArgsConstructor
 @ScimExtensionType(id = AllSchemaTypesExtension.SCHEMA_URN, description="All Schema Attribute Types", name="AllSchemaTypesExtension", required=true)
 public class AllSchemaTypesExtension implements ScimExtension {
   

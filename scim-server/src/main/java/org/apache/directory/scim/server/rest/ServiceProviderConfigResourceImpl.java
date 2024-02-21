@@ -39,9 +39,13 @@ import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration.Filter
 import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration.SupportedConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @ApplicationScoped
+@RestController
+@RequestMapping("/scim/v2/ServiceProviderConfig")
 public class ServiceProviderConfigResourceImpl implements ServiceProviderConfigResource {
 
   private final ServerConfiguration serverConfiguration;

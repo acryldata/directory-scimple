@@ -27,7 +27,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.hamcrest.Matchers.*;
 
 @ExtendWith(EmbeddedServerExtension.class)
-public class CustomExtensionIT extends ScimpleITSupport {
+public class  CustomExtensionIT extends ScimpleITSupport {
 
   @Test
   public void extensionDataTest() {

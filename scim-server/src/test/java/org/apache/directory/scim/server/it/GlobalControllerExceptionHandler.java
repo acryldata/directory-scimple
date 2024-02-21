@@ -1,7 +1,6 @@
 package org.apache.directory.scim.server.it;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.directory.scim.protocol.data.ErrorResponse;
 import org.apache.directory.scim.protocol.exception.ScimException;
 import org.apache.directory.scim.spec.exception.ResourceException;
 import org.springframework.beans.ConversionNotSupportedException;
@@ -12,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
+import org.apache.directory.scim.protocol.data.ErrorResponse;
 
 @Slf4j
 @ControllerAdvice
@@ -30,4 +30,5 @@ public class GlobalControllerExceptionHandler extends DefaultHandlerExceptionRes
   public ResponseEntity<ErrorResponse> handleResourceException(ResourceException e) {
     return new ErrorResponse(HttpStatus.valueOf(e.getStatus()), e.getMessage()).toResponseEntity();
   }
+
 }

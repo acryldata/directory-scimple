@@ -22,6 +22,8 @@ package org.apache.directory.scim.spec.resources;
 import java.io.Serializable;
 
 import jakarta.xml.bind.annotation.XmlRootElement;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
 @XmlRootElement(name = "ScimExtension")

@@ -23,30 +23,36 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
-import jakarta.ws.rs.core.Response;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.directory.scim.core.repository.PatchHandler;
-import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
 import org.apache.directory.scim.core.repository.Repository;
+import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
 import org.apache.directory.scim.spec.exception.ResourceException;
+import org.apache.directory.scim.spec.filter.Filter;
 import org.apache.directory.scim.spec.filter.FilterExpressions;
 import org.apache.directory.scim.spec.filter.FilterResponse;
-import org.apache.directory.scim.spec.filter.Filter;
 import org.apache.directory.scim.spec.filter.PageRequest;
 import org.apache.directory.scim.spec.filter.SortRequest;
 import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
 import org.apache.directory.scim.spec.patch.PatchOperation;
 import org.apache.directory.scim.spec.resources.ScimExtension;
 import org.apache.directory.scim.spec.resources.ScimGroup;
-import org.apache.directory.scim.core.schema.SchemaRegistry;
-
-import java.util.*;
-import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 
 @Named
 @ApplicationScoped
+@org.springframework.stereotype.Repository
 public class InMemoryGroupService implements Repository<ScimGroup> {
 
   private final Map<String, ScimGroup> groups = new HashMap<>();
@@ -56,6 +62,7 @@ public class InMemoryGroupService implements Repository<ScimGroup> {
   private PatchHandler patchHandler;
 
   @Inject
+  @Autowired
   public InMemoryGroupService(SchemaRegistry schemaRegistry, PatchHandler patchHandler) {
     this.schemaRegistry = schemaRegistry;
     this.patchHandler = patchHandler;

@@ -35,6 +35,13 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
+import org.apache.directory.scim.protocol.data.ListResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 /**
  * From SCIM Protocol Specification, section 4, page 74
@@ -72,26 +79,28 @@ import jakarta.ws.rs.core.UriInfo;
 public interface SchemaResource {
 
   @GET
+  @GetMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description="Get All Schemas")
   @ApiResponse(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
     array = @ArraySchema(schema = @Schema(implementation = org.apache.directory.scim.spec.schema.Schema.class))))
-  default Response getAllSchemas(@QueryParam("filter") String filter, @Context UriInfo uriInfo) {
+  default ResponseEntity<ListResponse<org.apache.directory.scim.spec.schema.Schema>> getAllSchemas(@QueryParam("filter") @RequestParam(name="filter" ,required = false) String filter) {
 
     if (filter != null) {
-      return Response.status(Status.FORBIDDEN).build();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
     
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 
   @GET
+  @GetMapping(value = "{uri}", produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Path("{uri}")
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description="Get Schemas by URN")
   @ApiResponse(content = @Content(mediaType = Constants.SCIM_CONTENT_TYPE,
     schema = @Schema(implementation = org.apache.directory.scim.spec.schema.Schema.class)))
-  default Response getSchema(@PathParam("uri") String uri, @Context UriInfo uriInfo) {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+  default ResponseEntity<org.apache.directory.scim.spec.schema.Schema> getSchema(@PathParam("uri") @PathVariable(name = "uri") String uri) {
+    return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 }

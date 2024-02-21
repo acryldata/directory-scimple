@@ -39,7 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @Slf4j
 @RestController
-@RequestMapping("scim/v2/Users")
+@RequestMapping("/scim/v2/Users")
+@ApplicationScoped  // Keeping it for JAX-RS based test to work
 public class UserResourceImpl extends BaseResourceTypeResourceImpl<ScimUser> implements UserResource {
 
   @Inject

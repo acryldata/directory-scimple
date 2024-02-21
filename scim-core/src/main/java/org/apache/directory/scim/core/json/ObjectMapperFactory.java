@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.introspect.AnnotationIntrospectorPair;
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationIntrospector;
 import com.fasterxml.jackson.module.jakarta.xmlbind.JakartaXmlBindAnnotationModule;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
@@ -40,7 +41,7 @@ import java.io.IOException;
  */
 public class ObjectMapperFactory {
 
-  private final static ObjectMapper objectMapper = createObjectMapper();
+  private final static ObjectMapper objectMapper = createObjectMapper(new ObjectMapper());
 
   /**
    * Returns an ObjectMapper configured for use with Jackson and Jakarta bindings.
@@ -52,9 +53,7 @@ public class ObjectMapperFactory {
     return objectMapper;
   }
 
-  private static ObjectMapper createObjectMapper() {
-    ObjectMapper objectMapper = new ObjectMapper();
-
+  private static ObjectMapper createObjectMapper(ObjectMapper objectMapper) {
     AnnotationIntrospector pair = new AnnotationIntrospectorPair(
       new JakartaXmlBindAnnotationIntrospector(objectMapper.getTypeFactory()),
       new JacksonAnnotationIntrospector());
@@ -71,7 +70,19 @@ public class ObjectMapperFactory {
    * Creates and configures an {@link ObjectMapper} SCIM Resource in REST request and responses {@code application/scim+json}.
    */
   public static ObjectMapper createObjectMapper(SchemaRegistry schemaRegistry) {
-    ObjectMapper objectMapper = createObjectMapper().copy();
+    ObjectMapper objectMapper = createObjectMapper(new ObjectMapper()).copy();
+    objectMapper.registerModule(new JakartaXmlBindAnnotationModule());
+    objectMapper.registerModule(new ScimResourceModule(schemaRegistry));
+    return objectMapper;
+  }
+
+  /***
+   * Spring has instanceOf check for XmlMapper and hence written this function
+   * @param schemaRegistry
+   * @return
+   */
+  public static ObjectMapper createXmlObjectMapper(SchemaRegistry schemaRegistry) {
+    ObjectMapper objectMapper = createObjectMapper(new XmlMapper()).copy();
     objectMapper.registerModule(new JakartaXmlBindAnnotationModule());
     objectMapper.registerModule(new ScimResourceModule(schemaRegistry));
     return objectMapper;

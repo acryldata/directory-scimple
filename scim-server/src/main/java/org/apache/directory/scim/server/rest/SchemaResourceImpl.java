@@ -34,8 +34,19 @@ import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.spec.schema.Meta;
 import org.apache.directory.scim.spec.schema.Schema;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
 
 @ApplicationScoped
+@RestController
+@RequestMapping("/scim/v2/Schemas")
 public class SchemaResourceImpl implements SchemaResource {
 
   private final SchemaRegistry schemaRegistry;
@@ -51,18 +62,19 @@ public class SchemaResourceImpl implements SchemaResource {
   }
 
   @Override
-  public Response getAllSchemas(String filter, UriInfo uriInfo) {
+  public ResponseEntity<ListResponse<Schema>> getAllSchemas(@RequestParam(name="filter", required = false) String filter) {
 
     if (filter != null) {
-      return Response.status(Status.FORBIDDEN).build();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
     
     ListResponse<Schema> listResponse = new ListResponse<>();
     Collection<Schema> schemas = schemaRegistry.getAllSchemas();
-    
+
+    UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null);
     for (Schema schema : schemas) {
       Meta meta = new Meta();
-      meta.setLocation(uriInfo.getAbsolutePathBuilder().path(schema.getId()).build().toString());
+      meta.setLocation(absolutePath.path(schema.getId()).build().toString());
       meta.setResourceType(Schema.RESOURCE_NAME);
       
       schema.setMeta(meta);
@@ -75,24 +87,26 @@ public class SchemaResourceImpl implements SchemaResource {
     List<Schema> objectList = new ArrayList<>(schemas);
     listResponse.setResources(objectList);
     
-    return Response.ok(listResponse).build();
+    return ResponseEntity.ok(listResponse);
   }
 
   @Override
-  public Response getSchema(String urn, UriInfo uriInfo) {
+  public ResponseEntity<Schema> getSchema(@PathVariable(name = "uri") String urn) {
     
     Schema schema = schemaRegistry.getSchema(urn);
     if (schema == null){
-      return Response.status(Status.NOT_FOUND).build();  
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-    
+
+    UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null);
+
     Meta meta = new Meta();
-    meta.setLocation(uriInfo.getAbsolutePath().toString());
+    meta.setLocation(absolutePath.build().toString());
     meta.setResourceType(Schema.RESOURCE_NAME);
     
     schema.setMeta(meta);
     
-    return Response.ok(schema).build();
+    return ResponseEntity.ok(schema);
     
   }
 }

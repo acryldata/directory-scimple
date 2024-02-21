@@ -209,6 +209,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     return ResponseEntity.status(Status.CREATED.getStatusCode())
       .location(buildLocationTag(created))
       .header(HttpHeaders.ETAG, etag)
+      .header(HttpHeaders.CONTENT_TYPE, Constants.SCIM_CONTENT_TYPE)
       .body(created);
   }
 

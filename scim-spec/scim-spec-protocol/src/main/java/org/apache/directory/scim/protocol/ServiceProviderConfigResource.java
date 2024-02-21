@@ -34,6 +34,8 @@ import jakarta.ws.rs.core.UriInfo;
 import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import static jakarta.ws.rs.core.MediaType.*;
 import static org.apache.directory.scim.protocol.Constants.SCIM_CONTENT_TYPE;

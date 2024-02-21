@@ -29,9 +29,14 @@ import org.apache.directory.scim.core.repository.RepositoryRegistry;
 import org.apache.directory.scim.protocol.GroupResource;
 import org.apache.directory.scim.spec.resources.ScimGroup;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 
 @Slf4j
 @ApplicationScoped
+@RestController
+@RequestMapping("/scim/v2/Groups")
 public class GroupResourceImpl extends BaseResourceTypeResourceImpl<ScimGroup> implements GroupResource {
 
   @Inject

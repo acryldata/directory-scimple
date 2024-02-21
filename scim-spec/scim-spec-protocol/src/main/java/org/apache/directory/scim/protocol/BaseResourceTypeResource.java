@@ -64,8 +64,8 @@ public interface BaseResourceTypeResource<T> {
    * @throws ScimException
    * @throws UnableToRetrieveResourceException
    */
-  @GET
-  @GetMapping("{id}")
+  @GET()
+  @GetMapping(value = "{id}", produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description="Find by id")
   @ApiResponses(value={
@@ -87,7 +87,7 @@ public interface BaseResourceTypeResource<T> {
    *      query resources</a>
    * @return
    */
-  @GetMapping
+  @GetMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description="Find by a combination of query parameters")
   @ApiResponses(value={
@@ -113,7 +113,7 @@ public interface BaseResourceTypeResource<T> {
    *      query resources</a>
    * @return
    */
-  @PostMapping
+  @PostMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON}, consumes = {Constants.SCIM_CONTENT_TYPE})
   @Consumes({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Create")
@@ -138,7 +138,7 @@ public interface BaseResourceTypeResource<T> {
    *      query with post</a>
    * @return
    */
-  @PostMapping("/.search")
+  @PostMapping(value = "/.search", produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Search")
   @ApiResponses(value = {
@@ -158,7 +158,7 @@ public interface BaseResourceTypeResource<T> {
    *      update</a>
    * @return
    */
-  @PutMapping("{id}")
+  @PutMapping(value = "{id}", produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON}, consumes = {Constants.SCIM_CONTENT_TYPE})
   @Consumes({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Update")
@@ -179,7 +179,7 @@ public interface BaseResourceTypeResource<T> {
     return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
-  @PatchMapping("{id}")
+  @PatchMapping(value = "{id}", produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON}, consumes = {Constants.SCIM_CONTENT_TYPE})
   @Consumes({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Patch a portion of the backing store")
@@ -198,7 +198,7 @@ public interface BaseResourceTypeResource<T> {
     return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
 
-  @DeleteMapping("{id}")
+  @DeleteMapping(value = "{id}", produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Delete from the backing store")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "No Content"),

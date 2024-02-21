@@ -33,8 +33,20 @@ import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.spec.schema.Meta;
 import org.apache.directory.scim.spec.schema.ResourceType;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
+
 
 @ApplicationScoped
+@RestController
+@RequestMapping("/scim/v2/ResourceTypes")
 public class ResourceTypesResourceImpl implements ResourceTypesResource {
 
   private final SchemaRegistry schemaRegistry;
@@ -55,17 +67,18 @@ public class ResourceTypesResourceImpl implements ResourceTypesResource {
   }
 
   @Override
-  public Response getAllResourceTypes(String filter) {
+  public ResponseEntity<ListResponse<ResourceType>> getAllResourceTypes(@RequestParam(name = "filter", required = false) String filter) {
     
     if (filter != null) {
-      return Response.status(Status.FORBIDDEN).build();
+      return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     Collection<ResourceType> resourceTypes = schemaRegistry.getAllResourceTypes();
-    
+    UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null);
     for (ResourceType resourceType : resourceTypes) {
       Meta meta = new Meta();
-      meta.setLocation(uriInfo.getAbsolutePathBuilder().path(resourceType.getName()).build().toString());
+      String location = absolutePath.path(resourceType.getName()).build().toString();
+      meta.setLocation(location);
       meta.setResourceType(resourceType.getResourceType());
       
       resourceType.setMeta(meta);
@@ -79,23 +92,28 @@ public class ResourceTypesResourceImpl implements ResourceTypesResource {
     List<ResourceType> objectList = new ArrayList<>(resourceTypes);
     listResponse.setResources(objectList);
     
-    return Response.ok(listResponse).build();
+    return ResponseEntity.ok(listResponse);
   }
 
   @Override
-  public Response getResourceType(String name) {
+  public ResponseEntity<ResourceType> getResourceType(@PathVariable(name = "name") String name) {
     ResourceType resourceType = schemaRegistry.getResourceType(name);
     if (resourceType == null){
-      return Response.status(Status.NOT_FOUND).build();  
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
     
     Meta meta = new Meta();
-    meta.setLocation(uriInfo.getAbsolutePath().toString());
+
+    String location = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null)
+      .build().toString();
+
+    meta.setLocation(location);
+
     meta.setResourceType(resourceType.getResourceType());
     
     resourceType.setMeta(meta);
     
-    return Response.ok(resourceType).build();
+    return ResponseEntity.ok(resourceType);
   }
 
 }

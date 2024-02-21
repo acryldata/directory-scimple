@@ -24,10 +24,13 @@ import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.directory.scim.spec.annotation.ScimAttribute;
 import org.apache.directory.scim.spec.annotation.ScimExtensionType;
 import org.apache.directory.scim.spec.resources.ScimExtension;
 import org.apache.directory.scim.spec.schema.Schema;
+import org.springframework.stereotype.Component;
+
 
 /**
  * Allows a User's lucky number to be passed as part of the User's entry via
@@ -38,6 +41,7 @@ import org.apache.directory.scim.spec.schema.Schema;
 @XmlRootElement( name = "LuckyNumberExtension", namespace = "http://www.psu.edu/schemas/psu-scim" )
 @XmlAccessorType(XmlAccessType.NONE)
 @Data
+@NoArgsConstructor
 @ScimExtensionType(id = LuckyNumberExtension.SCHEMA_URN, description="Lucky Numbers", name="LuckyNumbers", required=true)
 public class LuckyNumberExtension implements ScimExtension {
   

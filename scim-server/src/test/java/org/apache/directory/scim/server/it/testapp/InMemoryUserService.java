@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.directory.scim.core.repository.PatchHandler;
 import org.apache.directory.scim.core.repository.Repository;
+import org.apache.directory.scim.core.repository.annotations.ScimProcessingExtension;
 import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
 import org.apache.directory.scim.spec.exception.ResourceException;
@@ -45,7 +46,9 @@ import org.apache.directory.scim.spec.resources.Name;
 import org.apache.directory.scim.spec.resources.ScimExtension;
 import org.apache.directory.scim.spec.resources.ScimResource;
 import org.apache.directory.scim.spec.resources.ScimUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 
 
 /**
@@ -56,6 +59,7 @@ import org.springframework.http.HttpStatus;
  */
 @Named
 @ApplicationScoped
+@org.springframework.stereotype.Repository
 public class InMemoryUserService implements Repository<ScimUser> {
 
   static final String DEFAULT_USER_ID = "1";
@@ -72,6 +76,7 @@ public class InMemoryUserService implements Repository<ScimUser> {
   private PatchHandler patchHandler;
 
   @Inject
+  @Autowired
   public InMemoryUserService(SchemaRegistry schemaRegistry, PatchHandler patchHandler) {
     this.schemaRegistry = schemaRegistry;
     this.patchHandler = patchHandler;
