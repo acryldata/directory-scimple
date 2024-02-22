@@ -66,25 +66,28 @@ public class ObjectMapperFactory {
     return objectMapper;
   }
 
+  private static void addSchemaRegistry(ObjectMapper objectMapper, SchemaRegistry schemaRegistry) {
+    objectMapper.registerModule(new JakartaXmlBindAnnotationModule());
+    objectMapper.registerModule(new ScimResourceModule(schemaRegistry));
+  }
+
   /**
    * Creates and configures an {@link ObjectMapper} SCIM Resource in REST request and responses {@code application/scim+json}.
    */
   public static ObjectMapper createObjectMapper(SchemaRegistry schemaRegistry) {
     ObjectMapper objectMapper = createObjectMapper(new ObjectMapper()).copy();
-    objectMapper.registerModule(new JakartaXmlBindAnnotationModule());
-    objectMapper.registerModule(new ScimResourceModule(schemaRegistry));
+    addSchemaRegistry(objectMapper, schemaRegistry);
     return objectMapper;
   }
 
   /***
-   * Spring has instanceOf check for XmlMapper and hence written this function
+   * Spring has instanceOf check for XmlMapper and hence added this function
    * @param schemaRegistry
    * @return
    */
   public static ObjectMapper createXmlObjectMapper(SchemaRegistry schemaRegistry) {
     ObjectMapper objectMapper = createObjectMapper(new XmlMapper()).copy();
-    objectMapper.registerModule(new JakartaXmlBindAnnotationModule());
-    objectMapper.registerModule(new ScimResourceModule(schemaRegistry));
+    addSchemaRegistry(objectMapper, schemaRegistry);
     return objectMapper;
   }
 
