@@ -9,6 +9,7 @@ import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.apache.directory.scim.server.configuration.ServerConfiguration;
 import org.apache.directory.scim.server.rest.EtagGenerator;
 import org.apache.directory.scim.spec.resources.ScimResource;
+import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +19,7 @@ public class ScimpleSpringTestApp {
 
   @Bean
   ServerConfiguration serverConfiguration() {
-    return new ServerConfiguration();
+    return new ServerConfiguration().addAuthenticationSchema(ServiceProviderConfiguration.AuthenticationSchema.oauthBearer());
   }
 
   @Bean

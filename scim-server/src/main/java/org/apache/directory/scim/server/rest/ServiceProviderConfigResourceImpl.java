@@ -41,6 +41,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 
 @ApplicationScoped
@@ -64,7 +66,7 @@ public class ServiceProviderConfigResourceImpl implements ServiceProviderConfigR
   }
 
   @Override
-  public ResponseEntity getServiceProviderConfiguration(UriInfo uriInfo) {
+  public ResponseEntity getServiceProviderConfiguration() {
     ServiceProviderConfiguration serviceProviderConfiguration = new ServiceProviderConfiguration();
     List<AuthenticationSchema> authenticationSchemas = serverConfiguration.getAuthenticationSchemas();
     BulkConfiguration bulk = serverConfiguration.getBulkConfiguration();
@@ -77,7 +79,7 @@ public class ServiceProviderConfigResourceImpl implements ServiceProviderConfigR
     String externalId = serverConfiguration.getId();
     String id = serverConfiguration.getId();
     Meta meta = new Meta();
-    String location = uriInfo.getAbsolutePath().toString();
+    String location = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null).toUriString();
     String resourceType = "ServiceProviderConfig";
     LocalDateTime now = LocalDateTime.now();
 

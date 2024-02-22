@@ -34,8 +34,10 @@ import jakarta.ws.rs.core.UriInfo;
 import org.apache.directory.scim.spec.schema.ServiceProviderConfiguration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 
 import static jakarta.ws.rs.core.MediaType.*;
 import static org.apache.directory.scim.protocol.Constants.SCIM_CONTENT_TYPE;
@@ -66,11 +68,12 @@ import static org.apache.directory.scim.protocol.Constants.SCIM_CONTENT_TYPE;
 public interface ServiceProviderConfigResource {
 
   @GET
+  @GetMapping(produces = {SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description="Get Service Provider Configuration")
   @ApiResponse(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                schema = @Schema(implementation = ServiceProviderConfiguration.class)))
-  default ResponseEntity<Object> getServiceProviderConfiguration(@Context UriInfo context) {
+  default ResponseEntity<ServiceProviderConfiguration> getServiceProviderConfiguration() {
     return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).build();
   }
 }

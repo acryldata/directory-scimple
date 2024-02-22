@@ -63,15 +63,17 @@
 
     <module>scim-core</module>
     <module>scim-server</module>
-    <module>scim-server-examples/scim-server-memory</module>
-    <module>scim-server-examples/scim-server-jersey</module>
-    <module>scim-server-examples/scim-server-quarkus</module>
-    <module>scim-server-examples/scim-server-spring-boot</module>
-    <module>support/spring-boot</module>
+
+<!-- Test of below module are not working as we have added spring related configuration in Apache SCIM Rest Api-->
+<!--    <module>scim-server-examples/scim-server-memory</module>-->
+<!--    <module>scim-server-examples/scim-server-jersey</module>-->
+<!--    <module>scim-server-examples/scim-server-quarkus</module>-->
+<!--    <module>scim-server-examples/scim-server-spring-boot</module>-->
+<!--    <module>support/spring-boot</module>-->
     <module>scim-tools</module>
     <module>scim-compliance-tests</module>
     <module>scim-test</module>
-<!--    <module>scim-coverage</module>-->
+    <module>scim-coverage</module>
   </modules>
 
   <scm>
