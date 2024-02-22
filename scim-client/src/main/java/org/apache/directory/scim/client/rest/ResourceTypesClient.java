@@ -19,16 +19,13 @@
 
 package org.apache.directory.scim.client.rest;
 
-import java.util.List;
-import java.util.Optional;
-
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
-
-import org.apache.directory.scim.protocol.ResourceTypesResource;
+import java.util.List;
+import java.util.Optional;
 import org.apache.directory.scim.spec.schema.ResourceType;
 
 public class ResourceTypesClient implements AutoCloseable {
@@ -75,9 +72,8 @@ public class ResourceTypesClient implements AutoCloseable {
     this.client.close();
   }
 
-  private class ResourceTypesResourceClient implements ResourceTypesResource {
+  private class ResourceTypesResourceClient{
 
-    @Override
     public Response getAllResourceTypes(String filter) throws RestException {
       Response response = ResourceTypesClient.this.target
           .queryParam("filter", filter)
@@ -87,7 +83,6 @@ public class ResourceTypesClient implements AutoCloseable {
       return response;
     }
 
-    @Override
     public Response getResourceType(String name) throws RestException {
       Response response = ResourceTypesClient.this.target
           .path(name)

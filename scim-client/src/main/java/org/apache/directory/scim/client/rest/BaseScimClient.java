@@ -19,10 +19,6 @@
 
 package org.apache.directory.scim.client.rest;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
 import jakarta.ws.rs.ProcessingException;
 import jakarta.ws.rs.client.Client;
 import jakarta.ws.rs.client.Entity;
@@ -31,21 +27,24 @@ import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-
-import org.apache.directory.scim.protocol.adapter.FilterWrapper;
-import org.apache.directory.scim.spec.annotation.ScimResourceType;
-import org.apache.directory.scim.protocol.BaseResourceTypeResource;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import org.apache.directory.scim.protocol.Constants;
-import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
-import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
+import org.apache.directory.scim.protocol.adapter.FilterWrapper;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
 import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.protocol.data.PatchRequest;
 import org.apache.directory.scim.protocol.data.SearchRequest;
 import org.apache.directory.scim.protocol.exception.ScimException;
+import org.apache.directory.scim.spec.annotation.ScimResourceType;
 import org.apache.directory.scim.spec.filter.Filter;
 import org.apache.directory.scim.spec.filter.SortOrder;
+import org.apache.directory.scim.spec.filter.attribute.AttributeReference;
+import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
 import org.apache.directory.scim.spec.resources.ScimResource;
+import org.springframework.http.HttpStatus;
+
 
 public abstract class BaseScimClient<T extends ScimResource> implements AutoCloseable {
 
@@ -100,7 +99,7 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
       } else {
         ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
 
-        throw new ScimException(errorResponse, Status.fromStatusCode(response.getStatus()));
+        throw new ScimException(errorResponse, HttpStatus.valueOf(response.getStatus()));
       }
     } finally {
       RestClientUtil.close(response);
@@ -171,7 +170,7 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
         Status status = Status.fromStatusCode(response.getStatus());
         ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
 
-        throw new ScimException(errorResponse, status);
+        throw new ScimException(errorResponse, HttpStatus.valueOf(status.getStatusCode()));
       }
     } finally {
       RestClientUtil.close(response);
@@ -185,18 +184,18 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
         Status status = Status.fromStatusCode(response.getStatus());
         ErrorResponse errorResponse = response.readEntity(ErrorResponse.class);
 
-        throw new ScimException(errorResponse, status);
+        throw new ScimException(errorResponse, HttpStatus.valueOf(status.getStatusCode()));
       }
     } catch (ProcessingException e) {
-      ErrorResponse er = new ErrorResponse(Status.INTERNAL_SERVER_ERROR, e.getMessage());
-      throw new ScimException(er, Status.INTERNAL_SERVER_ERROR);
+      ErrorResponse er = new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+      throw new ScimException(er, HttpStatus.INTERNAL_SERVER_ERROR);
     } finally {
       RestClientUtil.close(response);
     }
   }
 
   static ScimException toScimException(RestException restException) {
-    return new ScimException(restException.getError(), restException.getStatus());
+    return new ScimException(restException.getError(), HttpStatus.valueOf(restException.getStatusCode()));
   }
 
   public RestCall getInvoke() {
@@ -207,7 +206,7 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
     this.invoke = invoke;
   }
 
-  private class InternalScimClient implements BaseResourceTypeResource<T> {
+  private class InternalScimClient {
 
     private static final String FILTER_QUERY_PARAM = "filter";
     private static final String SORT_BY_QUERY_PARAM = "sortBy";
@@ -215,7 +214,6 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
     private static final String START_INDEX_QUERY_PARAM = "startIndex";
     private static final String COUNT_QUERY_PARAM = "count";
 
-    @Override
     public Response getById(String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException {
       Response response;
       Invocation request = BaseScimClient.this.target
@@ -234,7 +232,6 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
       }
     }
 
-    @Override
     public Response query(AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes, FilterWrapper filter, AttributeReference sortBy, SortOrder sortOrder, Integer startIndex, Integer count) throws ScimException {
       Response response;
       Invocation request = BaseScimClient.this.target
@@ -257,7 +254,6 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
       }
     }
 
-    @Override
     public Response create(T resource, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException {
       Response response;
       Invocation request = BaseScimClient.this.target
@@ -275,7 +271,6 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
       }
     }
 
-    @Override
     public Response find(SearchRequest searchRequest) throws ScimException {
       Response response;
       Invocation request = BaseScimClient.this.target
@@ -292,7 +287,6 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
       }
     }
 
-    @Override
     public Response update(T resource, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException {
       Response response;
       Invocation request = BaseScimClient.this.target
@@ -311,7 +305,6 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
       }
     }
 
-    @Override
     public Response patch(PatchRequest patchRequest, String id, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException {
       Response response;
       Invocation request = BaseScimClient.this.target
@@ -330,7 +323,6 @@ public abstract class BaseScimClient<T extends ScimResource> implements AutoClos
       }
     }
 
-    @Override
     public Response delete(String id) throws ScimException {
       Response response;
       Invocation request = BaseScimClient.this.target

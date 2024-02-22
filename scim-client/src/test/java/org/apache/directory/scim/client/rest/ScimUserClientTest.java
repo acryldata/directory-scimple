@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.http.HttpStatus;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -195,7 +196,7 @@ public class ScimUserClientTest extends ClientTestSupport {
     testUser.setId("500-id");
 
     ScimException exception = assertThrows(ScimException.class, () -> client.update("500-id", testUser));
-    assertThat(exception.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR);
+    assertThat(exception.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 
   @Test
@@ -241,6 +242,6 @@ public class ScimUserClientTest extends ClientTestSupport {
       .setResponseCode(500));
 
     ScimException exception = assertThrows(ScimException.class, () -> client.delete("500-id"));
-    assertThat(exception.getStatus()).isEqualTo(Response.Status.INTERNAL_SERVER_ERROR);
+    assertThat(exception.getStatus()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

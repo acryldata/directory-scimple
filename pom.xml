@@ -56,11 +56,7 @@
   <modules>
     <module>scim-spec/scim-spec-schema</module>
     <module>scim-spec/scim-spec-protocol</module>
-
-    <!-- Not needed in DataHub
-      <module>scim-client</module>
-    -->
-
+    <module>scim-client</module>
     <module>scim-core</module>
     <module>scim-server</module>
 

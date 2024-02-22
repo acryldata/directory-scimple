@@ -16,6 +16,7 @@
  */
 package org.apache.directory.scim.client.rest;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -26,6 +27,9 @@ import jakarta.ws.rs.core.GenericType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.Response.Status.Family;
+import org.apache.directory.scim.spec.resources.ScimResource;
+import org.springframework.http.ResponseEntity;
+
 
 public final class RestClientUtil {
 

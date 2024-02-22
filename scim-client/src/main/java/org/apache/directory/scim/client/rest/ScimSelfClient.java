@@ -30,7 +30,9 @@ import org.apache.directory.scim.protocol.SelfResource;
 import org.apache.directory.scim.spec.filter.attribute.AttributeReferenceListWrapper;
 import org.apache.directory.scim.protocol.data.PatchRequest;
 import org.apache.directory.scim.protocol.exception.ScimException;
+import org.apache.directory.scim.spec.resources.ScimResource;
 import org.apache.directory.scim.spec.resources.ScimUser;
+import org.springframework.http.ResponseEntity;
 
 // purposefully does not extend BaseScimClient, has a different utility than other clients
 
@@ -106,9 +108,8 @@ public class ScimSelfClient implements AutoCloseable {
     this.client.close();
   }
 
-  private class SelfResourceClient implements SelfResource {
+  private class SelfResourceClient {
 
-    @Override
     public Response getSelf(AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException {
       Response response;
       Invocation request = ScimSelfClient.this.target
@@ -125,7 +126,6 @@ public class ScimSelfClient implements AutoCloseable {
       return response;
     }
 
-    @Override
     public Response update(ScimUser scimUser, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException {
       Response response;
       Invocation request = ScimSelfClient.this.target
@@ -142,7 +142,6 @@ public class ScimSelfClient implements AutoCloseable {
       return response;
     }
 
-    @Override
     public Response patch(PatchRequest patchRequest, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException {
       Response response;
       Invocation request = ScimSelfClient.this.target
@@ -159,7 +158,6 @@ public class ScimSelfClient implements AutoCloseable {
       return response;
     }
 
-    @Override
     public Response delete() throws ScimException {
       Response response;
       Invocation request = ScimSelfClient.this.target
