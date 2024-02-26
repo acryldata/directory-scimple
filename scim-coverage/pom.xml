@@ -21,7 +21,7 @@
   <parent>
     <groupId>io.acryl</groupId>
     <artifactId>scimple</artifactId>
-    <version>1.0.0-M1</version>
+    <version>1.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>scim-test-coverage</artifactId>
@@ -54,14 +54,14 @@
       <groupId>io.acryl</groupId>
       <artifactId>scim-server</artifactId>
     </dependency>
-    <dependency>
-      <groupId>io.acryl</groupId>
-      <artifactId>scim-spring-boot-starter</artifactId>
-    </dependency>
 <!--    <dependency>-->
 <!--      <groupId>io.acryl</groupId>-->
-<!--      <artifactId>scim-client</artifactId>-->
+<!--      <artifactId>scim-spring-boot-starter</artifactId>-->
 <!--    </dependency>-->
+    <dependency>
+      <groupId>io.acryl</groupId>
+      <artifactId>scim-client</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
