@@ -66,6 +66,30 @@ What is SCM release tag or label for "Apache Directory SCIMple"? (org.apache.dir
 
 ### Prepare the Release
 
+1. Generate GPG key:
+```shell
+  gpg --gen-key
+```
+2. export GPG_TTY=$(tty)
+3. Get signing key: <br/> 
+Execute The command: gpg --list-secret-keys --keyid-format=long <br/>
+The sample output of Command: <br/>
+   Sample Output:
+
+        [keyboxd]
+        ---------
+        sec   ed25519/4C52BA9DE5467575 2024-02-27 [SC] [expires: 2027-02-26]
+            839E310E1AD91353F38537BE4C52BA9DE5467575
+        uid                 [ultimate] Datahub <datahub@acryl.io>
+
+   Here 4C52BA9DE5467575 is the key-id
+
+4. Configure signing key in git:
+
+  ```shell
+  git config --global user.signingkey <key-id>
+  ```
+
 ```shell
 $ ./mvnw release:clean
 $ ./mvnw release:prepare
