@@ -53,6 +53,17 @@
     <jacoco.it.argline />
   </properties>
 
+  <distributionManagement>
+    <snapshotRepository>
+      <id>acryl-nexus</id>
+      <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+    <repository>
+      <id>acryl-nexus</id>
+      <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    </repository>
+  </distributionManagement>
+
   <modules>
     <module>scim-spec/scim-spec-schema</module>
     <module>scim-spec/scim-spec-protocol</module>
@@ -353,7 +364,8 @@
         <extensions>true</extensions>
         <configuration>
           <serverId>acryl-nexus</serverId>
-          <nexusUrl>https://s01.oss.sonatype.org/content</nexusUrl>
+          <nexusUrl>https://s01.oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
       <plugin>
