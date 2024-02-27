@@ -352,8 +352,8 @@
         <version>1.6.13</version>
         <extensions>true</extensions>
         <configuration>
-          <serverId>apache.releases.https</serverId>
-          <nexusUrl>https://repository.apache.org/</nexusUrl>
+          <serverId>acryl-nexus</serverId>
+          <nexusUrl>https://s01.oss.sonatype.org/service/local/</nexusUrl>
         </configuration>
       </plugin>
       <plugin>
