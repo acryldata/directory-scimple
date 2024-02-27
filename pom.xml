@@ -73,9 +73,9 @@
   </modules>
 
   <scm>
-    <connection>scm:git:https://github.com/apache/directory-scimple.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/apache/directory-scimple.git</developerConnection>
-    <url>https://github.com/apache/directory-scimple</url>
+    <connection>scm:git:https://github.com/acryldata/directory-scimple.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/acryldata/directory-scimple.git</developerConnection>
+    <url>https://github.com/acryldata/directory-scimple</url>
     <tag>1.0.0-SNAPSHOT</tag>
   </scm>
 
@@ -120,6 +120,12 @@
       <url>https://blog.bdemers.io/</url>
       <timezone>-0500</timezone>
     </developer>
+    <developer>
+      <id>sid-acryl</id>
+      <email>siddique.bagwan@acryl.com</email>
+      <timezone>+0530</timezone>
+    </developer>
+
   </developers>
 
   <dependencyManagement>
