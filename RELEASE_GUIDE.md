@@ -1,4 +1,4 @@
-# Apache Directory SCIMple Release Guide
+ # Apache Directory SCIMple Release Guide
 
 > **NOTE:** This guide is a work in progress.
 
@@ -66,30 +66,65 @@ What is SCM release tag or label for "Apache Directory SCIMple"? (org.apache.dir
 
 ### Prepare the Release
 
-1. Generate GPG key:
+1. Ask for GPG private key, key passphrase and nexus (i.e. maven repo) username and password to Acryl Team
+
+2. Import the key using gpg command 
+
+  ```shell
+    gpg --import ~/acryl-gpg-private-key.pem
+  ```
+
+3. List keys and check if imported key is expired. Key expiry and key-id is available in output of below command. You can find the key id in `sec   432erwr/<key-id>`
+
 ```shell
-  gpg --gen-key
+gpg --list-secret-keys --keyid-format=long
+``` 
+
+4. If key is expired then increase the expiry date by editing the key. Execute below command and follow the prompts. We don't need to change the sub-key, just change the expiry of the primary key 
+
+```shell
+gpg --edit-key <key-id>
 ```
-2. export GPG_TTY=$(tty)
-3. Get signing key: <br/> 
-Execute The command: gpg --list-secret-keys --keyid-format=long <br/>
-The sample output of Command: <br/>
-   Sample Output:
 
-        [keyboxd]
-        ---------
-        sec   ed25519/4C52BA9DE5467575 2024-02-27 [SC] [expires: 2027-02-26]
-            839E310E1AD91353F38537BE4C52BA9DE5467575
-        uid                 [ultimate] Datahub <datahub@acryl.io>
+5. Enable TTY for gpg command. gpg command will ask for passphrase on TTY.
 
-   Here 4C52BA9DE5467575 is the key-id
+```shell
+export GPG_TTY=$(tty)
+```
 
-4. Configure signing key in git:
+6. Configure signing key in git:
 
   ```shell
   git config --global user.signingkey <key-id>
   ```
+  
+7. Configure the key-id and nexus username and password in `~/.m2/settings.xml` as shown below 
 
+```shell
+<settings>
+  <profiles>
+    <profile>
+      <id>gpg</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <gpg.keyname>[key-id]</gpg.keyname>
+        <gpg.passphrase>[key-passphrase]</gpg.passphrase>
+      </properties>
+    </profile>
+  </profiles>
+  <servers>
+    <server>
+      <id>acryl-nexus</id>
+      <username>[nexus username]</username>
+      <password>[nexus password]</password>
+    </server>
+  </servers>
+</settings>
+``` 
+
+8. Execute clean and prepare maven goals to complete the publishing
 ```shell
 $ ./mvnw release:clean
 $ ./mvnw release:prepare
