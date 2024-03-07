@@ -100,11 +100,6 @@ public class BulkResourceImpl implements BulkResource {
     this.repositoryRegistry = repositoryRegistry;
   }
 
-  public BulkResourceImpl() {
-    // CDI
-    this(null, null);
-  }
-
   @Override
   public Response doBulk(BulkRequest request, UriInfo uriInfo) {
     BulkResponse response;

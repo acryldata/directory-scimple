@@ -51,10 +51,6 @@ public class ScimJacksonXmlBindJsonProvider extends JacksonXmlBindJsonProvider {
                                                                 ListResponse.class.getPackage(),
                                                                 ServiceProviderConfiguration.class.getPackage());
 
-  public ScimJacksonXmlBindJsonProvider() {
-    // CDI
-  }
-
   @Inject
   public ScimJacksonXmlBindJsonProvider(SchemaRegistry schemaRegistry) {
     super(ObjectMapperFactory.createObjectMapper(schemaRegistry), DEFAULT_ANNOTATIONS);

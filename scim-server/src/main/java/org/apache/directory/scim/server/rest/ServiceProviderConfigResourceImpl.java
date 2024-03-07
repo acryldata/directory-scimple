@@ -60,11 +60,6 @@ public class ServiceProviderConfigResourceImpl implements ServiceProviderConfigR
     this.etagGenerator = etagGenerator;
   }
 
-  public ServiceProviderConfigResourceImpl() {
-    // CDI
-    this(null, null);
-  }
-
   @Override
   public ResponseEntity getServiceProviderConfiguration() {
     ServiceProviderConfiguration serviceProviderConfiguration = new ServiceProviderConfiguration();

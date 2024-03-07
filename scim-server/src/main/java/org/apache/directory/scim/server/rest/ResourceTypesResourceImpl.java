@@ -61,11 +61,6 @@ public class ResourceTypesResourceImpl implements ResourceTypesResource {
     this.schemaRegistry = schemaRegistry;
   }
 
-  public ResourceTypesResourceImpl() {
-    // CDI
-    this(null);
-  }
-
   @Override
   public ResponseEntity<ListResponse<ResourceType>> getAllResourceTypes(@RequestParam(name = "filter", required = false) String filter) {
     

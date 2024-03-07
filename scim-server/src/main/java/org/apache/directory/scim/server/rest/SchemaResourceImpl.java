@@ -56,11 +56,6 @@ public class SchemaResourceImpl implements SchemaResource {
     this.schemaRegistry = schemaRegistry;
   }
 
-  public SchemaResourceImpl() {
-    // CDI
-    this(null);
-  }
-
   @Override
   public ResponseEntity<ListResponse<Schema>> getAllSchemas(@RequestParam(name="filter", required = false) String filter) {
 

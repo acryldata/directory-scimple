@@ -62,11 +62,6 @@ public class SelfResourceImpl implements SelfResource {
     this.selfIdResolver = selfIdResolver;
   }
 
-  public SelfResourceImpl() {
-    // CDI
-    this(null, null);
-  }
-
   @Override
   public ResponseEntity<? extends ScimResource> getSelf(WebRequest request, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
     String internalId = getInternalId();
