@@ -69,11 +69,14 @@ public class ResourceTypesResourceImpl implements ResourceTypesResource {
     }
 
     Collection<ResourceType> resourceTypes = schemaRegistry.getAllResourceTypes();
-    UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null);
     for (ResourceType resourceType : resourceTypes) {
       Meta meta = new Meta();
-      String location = absolutePath.path(resourceType.getName()).build().toString();
+      UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null);
+
+      String location = absolutePath.path("/").path(resourceType.getName()).build().toString();
+
       meta.setLocation(location);
+
       meta.setResourceType(resourceType.getResourceType());
       
       resourceType.setMeta(meta);
@@ -99,7 +102,7 @@ public class ResourceTypesResourceImpl implements ResourceTypesResource {
     
     Meta meta = new Meta();
 
-    String location = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null)
+    String location = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null)
       .build().toString();
 
     meta.setLocation(location);

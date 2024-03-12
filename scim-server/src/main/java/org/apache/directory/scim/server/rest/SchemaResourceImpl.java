@@ -29,6 +29,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.directory.scim.protocol.SchemaResource;
 import org.apache.directory.scim.protocol.data.ListResponse;
 import org.apache.directory.scim.spec.schema.Meta;
@@ -47,6 +48,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 @ApplicationScoped
 @RestController
 @RequestMapping("/scim/v2/Schemas")
+@Slf4j
 public class SchemaResourceImpl implements SchemaResource {
 
   private final SchemaRegistry schemaRegistry;
@@ -66,10 +68,10 @@ public class SchemaResourceImpl implements SchemaResource {
     ListResponse<Schema> listResponse = new ListResponse<>();
     Collection<Schema> schemas = schemaRegistry.getAllSchemas();
 
-    UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null);
     for (Schema schema : schemas) {
       Meta meta = new Meta();
-      meta.setLocation(absolutePath.path(schema.getId()).build().toString());
+      UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null);
+      meta.setLocation(absolutePath.path("/").path(schema.getId()).build().toString());
       meta.setResourceType(Schema.RESOURCE_NAME);
       
       schema.setMeta(meta);
@@ -93,10 +95,12 @@ public class SchemaResourceImpl implements SchemaResource {
       return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null);
+    UriComponentsBuilder absolutePath = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null);
 
     Meta meta = new Meta();
+
     meta.setLocation(absolutePath.build().toString());
+
     meta.setResourceType(Schema.RESOURCE_NAME);
     
     schema.setMeta(meta);

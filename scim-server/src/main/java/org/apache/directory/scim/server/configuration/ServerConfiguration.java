@@ -55,7 +55,7 @@ public class ServerConfiguration {
   int bulkMaxPayloadSize = BULK_MAXIMUM_PAYLOAD_SIZE;  //TODO what should this be?
   
   @Setter(AccessLevel.NONE)
-  boolean supportsETag = true;
+  boolean supportsETag = false;
   
   boolean supportsFilter = true;
   int filterMaxResults = FILTER_MAXIMUM_RESULTS;
