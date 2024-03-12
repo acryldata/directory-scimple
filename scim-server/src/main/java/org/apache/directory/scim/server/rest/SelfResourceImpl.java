@@ -40,73 +40,17 @@ import org.apache.directory.scim.spec.resources.ScimUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.WebRequest;
 
 
+/**
+ * In DataHub self is not implemented
+ */
 @Slf4j
 @ApplicationScoped
+@RestController
+@RequestMapping("/scim/v2/Me")
 public class SelfResourceImpl implements SelfResource {
-
-  private final UserResource userResource;
-
-  private final Instance<SelfIdResolver> selfIdResolver;
-
-  // TODO: Field injection of SecurityContext should work with all implementations
-  // CDI can be used directly in Jakarta WS 4
-  @Context
-  SecurityContext securityContext;
-
-  @Inject
-  public SelfResourceImpl(UserResource userResource, Instance<SelfIdResolver> selfIdResolver) {
-    this.userResource = userResource;
-    this.selfIdResolver = selfIdResolver;
-  }
-
-  @Override
-  public ResponseEntity<? extends ScimResource> getSelf(WebRequest request, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    String internalId = getInternalId();
-    return userResource.getById(request, internalId, attributes, excludedAttributes);
-  }
-
-  // @Override
-  // public Response create(ScimUser resource, AttributeReferenceListWrapper
-  // attributes, AttributeReferenceListWrapper excludedAttributes) {
-  // String internalId = getInternalId();
-  // //TODO check if ids match in request
-  // return userResourceImpl.create(resource, attributes, excludedAttributes);
-  // }
-
-  @Override
-  public ResponseEntity<? extends ScimResource> update(WebRequest request, ScimUser resource, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    String internalId = getInternalId();
-    return userResource.update(request, resource, internalId, attributes, excludedAttributes);
-  }
-
-  @Override
-  public ResponseEntity<? extends ScimResource> patch(WebRequest request, PatchRequest patchRequest, AttributeReferenceListWrapper attributes, AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    String internalId = getInternalId();
-    return userResource.patch(request, patchRequest, internalId, attributes, excludedAttributes);
-  }
-
-  @Override
-  public ResponseEntity<? extends ScimResource> delete() throws ScimException, ResourceException {
-    String internalId = getInternalId();
-    return userResource.delete(internalId);
-  }
-
-  private String getInternalId() throws ResourceException {
-    Principal callerPrincipal = securityContext.getUserPrincipal();
-
-    if (callerPrincipal != null) {
-      log.debug("Resolved SelfResource principal to : {}", callerPrincipal.getName());
-    } else {
-      throw new UnableToResolveIdResourceException(HttpStatus.UNAUTHORIZED, "Unauthorized");
-    }
-
-    if (selfIdResolver.isUnsatisfied()) {
-      throw new UnableToResolveIdResourceException(HttpStatus.NOT_IMPLEMENTED, "Caller SelfIdResolver not available");
-    }
-
-    return selfIdResolver.get().resolveToInternalId(callerPrincipal);
-  }
 }

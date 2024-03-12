@@ -28,17 +28,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-
 import org.apache.directory.scim.protocol.data.PatchRequest;
 import org.apache.directory.scim.protocol.exception.ScimException;
 import org.apache.directory.scim.spec.exception.ResourceException;
@@ -51,11 +45,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.WebRequest;
 
 import static jakarta.ws.rs.core.MediaType.*;
-import static org.apache.directory.scim.protocol.Constants.SCIM_CONTENT_TYPE;
+import static org.apache.directory.scim.protocol.Constants.*;
 
 //@formatter:off
 /**
@@ -77,7 +71,6 @@ import static org.apache.directory.scim.protocol.Constants.SCIM_CONTENT_TYPE;
  */
 //@formatter:on
 
-@RequestMapping(SelfResource.PATH)
 @Tag(name="SCIM")
 public interface SelfResource {
 
@@ -89,7 +82,7 @@ public interface SelfResource {
    * @return
    * @throws UnableToRetrieveResourceException 
    */
-  @GetMapping
+  @GetMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description="Get self record")
   @ApiResponses(value={
@@ -100,9 +93,9 @@ public interface SelfResource {
     @ApiResponse(responseCode="500", description="Internal Server Error"),
     @ApiResponse(responseCode="501", description="Not Implemented")
   })
-    default ResponseEntity<? extends ScimResource> getSelf(WebRequest request, @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                             @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
+    default ResponseEntity<? extends ScimResource> getSelf(WebRequest request, @Parameter(name="attributes") @QueryParam("attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+                             @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    throw new ResourceException(Status.NOT_IMPLEMENTED.getStatusCode(), "Method is not implemented");
   }
 
   /**
@@ -110,7 +103,7 @@ public interface SelfResource {
    *      query resources</a>
    * @return
    */
-  @PostMapping
+  @PostMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description = "Create self record")
@@ -122,12 +115,13 @@ public interface SelfResource {
     @ApiResponse(responseCode = "409", description = "Conflict"),
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
-  default Response create(@RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
+  default ResponseEntity<? extends ScimResource> create(WebRequest request, @RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = ScimResource.class)),
-                                       required = true) ScimUser resource,
-                          @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                          @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+                                       required = false) @org.springframework.web.bind.annotation.RequestBody(required = false) ScimUser resource,
+                          @Parameter(name="attributes") @QueryParam("attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+                          @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+
+    throw new ResourceException(Status.NOT_IMPLEMENTED.getStatusCode(), "Method is not implemented");
   }
 
   /**
@@ -135,7 +129,7 @@ public interface SelfResource {
    *      update</a>
    * @return
    */
-  @PutMapping
+  @PutMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description = "Update self record")
@@ -147,13 +141,13 @@ public interface SelfResource {
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
   default ResponseEntity<? extends ScimResource> update(WebRequest request, @RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = ScimUser.class)),
-                                       required = true) ScimUser resource,
-                          @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                          @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
+                                       required = false) @org.springframework.web.bind.annotation.RequestBody(required = false) ScimUser resource,
+                          @Parameter(name="attributes") @QueryParam("attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+                          @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    throw new ResourceException(Status.NOT_IMPLEMENTED.getStatusCode(), "Method is not implemented");
   }
 
-  @PatchMapping
+  @PatchMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description = "Patch a portion of the backing store")
@@ -167,13 +161,13 @@ public interface SelfResource {
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
   default ResponseEntity<? extends ScimResource> patch(WebRequest request, @RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                                       schema = @Schema(implementation = PatchRequest.class)),
-                                      required = true) PatchRequest patchRequest,
-                         @Parameter(name="attributes") @QueryParam("attributes") AttributeReferenceListWrapper attributes,
-                         @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
-    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
+                                      required = false) @org.springframework.web.bind.annotation.RequestBody(required = false) PatchRequest patchRequest,
+                         @Parameter(name="attributes") @QueryParam("attributes") @RequestParam(name = "attributes", required = false) AttributeReferenceListWrapper attributes,
+                         @Parameter(name="excludedAttributes") @QueryParam("excludedAttributes") @RequestParam(name = "excludedAttributes", required = false) AttributeReferenceListWrapper excludedAttributes) throws ScimException, ResourceException {
+    throw new ResourceException(Status.NOT_IMPLEMENTED.getStatusCode(), "Method is not implemented");
   }
 
-  @DeleteMapping
+  @DeleteMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Operation(description = "Delete self record")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "No Content"),
@@ -182,6 +176,6 @@ public interface SelfResource {
     @ApiResponse(responseCode = "500", description = "Internal Server Error"),
     @ApiResponse(responseCode = "501", description = "Not Implemented") })
   default ResponseEntity<? extends ScimResource> delete() throws ScimException, ResourceException {
-    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
+    throw new ResourceException(Status.NOT_IMPLEMENTED.getStatusCode(), "Method is not implemented");
   }
 }
