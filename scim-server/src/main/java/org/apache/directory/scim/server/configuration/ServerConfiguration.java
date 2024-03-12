@@ -57,7 +57,7 @@ public class ServerConfiguration {
   @Setter(AccessLevel.NONE)
   boolean supportsETag = true;
   
-  boolean supportsFilter = false;
+  boolean supportsFilter = true;
   int filterMaxResults = FILTER_MAXIMUM_RESULTS;
   
   @Setter(AccessLevel.NONE)

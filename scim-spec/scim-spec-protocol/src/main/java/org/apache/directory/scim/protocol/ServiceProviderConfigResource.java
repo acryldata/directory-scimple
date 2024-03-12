@@ -28,6 +28,7 @@ import jakarta.ws.rs.GET;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
@@ -67,8 +68,7 @@ import static org.apache.directory.scim.protocol.Constants.SCIM_CONTENT_TYPE;
 @Tag(name="SCIM-Configuration")
 public interface ServiceProviderConfigResource {
 
-  @GET
-  @GetMapping(produces = {SCIM_CONTENT_TYPE, APPLICATION_JSON})
+  @GetMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Operation(description="Get Service Provider Configuration")
   @ApiResponse(content = @Content(mediaType = SCIM_CONTENT_TYPE,

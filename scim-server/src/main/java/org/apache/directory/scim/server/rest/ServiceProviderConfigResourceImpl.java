@@ -74,7 +74,7 @@ public class ServiceProviderConfigResourceImpl implements ServiceProviderConfigR
     String externalId = serverConfiguration.getId();
     String id = serverConfiguration.getId();
     Meta meta = new Meta();
-    String location = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).replacePath(null).toUriString();
+    String location = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).toUriString();
     String resourceType = "ServiceProviderConfig";
     LocalDateTime now = LocalDateTime.now();
 
