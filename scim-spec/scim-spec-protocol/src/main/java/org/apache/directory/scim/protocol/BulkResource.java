@@ -31,12 +31,17 @@ import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.Context;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import jakarta.ws.rs.core.UriInfo;
 
 import org.apache.directory.scim.protocol.data.BulkRequest;
 import org.apache.directory.scim.protocol.data.BulkResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import static jakarta.ws.rs.core.MediaType.APPLICATION_JSON;
 import static org.apache.directory.scim.protocol.Constants.SCIM_CONTENT_TYPE;
@@ -65,6 +70,7 @@ public interface BulkResource {
    * @see <a href="https://tools.ietf.org/html/rfc7644#section-3.7">Bulk Operations</a>
    * @return
    */
+  @PostMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON}, consumes = {Constants.SCIM_CONTENT_TYPE})
   @POST
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
@@ -75,11 +81,11 @@ public interface BulkResource {
       @ApiResponse(responseCode="500", description="Internal Server Error"),
       @ApiResponse(responseCode="501", description="Not Implemented")
     })
-  default Response doBulk(@RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
+  default ResponseEntity doBulk(@RequestBody(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                                        schema = @Schema(implementation = BulkRequest.class)),
-                                       required = true) BulkRequest bulkRequest,
-                          @Context UriInfo uriInfo) {
-    return Response.status(Status.NOT_IMPLEMENTED).build();
+                                       required = true) @org.springframework.web.bind.annotation.RequestBody BulkRequest request,
+    UriComponentsBuilder uriComponentsBuilder) {
+    return ResponseEntity.status(Status.NOT_IMPLEMENTED.getStatusCode()).build();
   }
   
 }

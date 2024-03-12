@@ -21,9 +21,6 @@ package org.apache.directory.scim.server.rest;
 
 import jakarta.enterprise.inject.Instance;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriBuilder;
-import jakarta.ws.rs.core.UriInfo;
-import java.net.URI;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -42,6 +39,8 @@ import org.apache.directory.scim.spec.resources.ScimUser;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -98,24 +97,20 @@ public class BulkResourceImplTest {
     when(groupRepository.create(any())).thenReturn(group);
 
     BulkResourceImpl impl = new BulkResourceImpl(schemaRegistry, repositoryRegistry);
-    UriInfo uriInfo = mock(UriInfo.class);
-    UriBuilder uriBuilder = mock(UriBuilder.class);
-    when(uriInfo.getBaseUriBuilder()).thenReturn(uriBuilder);
-    when(uriBuilder.path("/Users")).thenReturn(uriBuilder);
-    when(uriBuilder.path("alice-id")).thenReturn(uriBuilder);
-    when(uriBuilder.build())
-      .thenReturn(URI.create("https://scim.example.com/Users/alice-id"))
-      .thenReturn(URI.create("https://scim.example.com/Groups/tour-guides"));
-    when(uriBuilder.path("/Groups")).thenReturn(uriBuilder);
-    when(uriBuilder.path("tour-guides")).thenReturn(uriBuilder);
+    // Create a mock HttpServletRequest
+    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString("https://scim.example.com/Bulk");
 
-    Response response = impl.doBulk(bulkRequest, uriInfo);
-    BulkResponse bulkResponse = (BulkResponse) response.getEntity();
+    ResponseEntity response = impl.doBulk(bulkRequest, uriComponentsBuilder);
+
+    BulkResponse bulkResponse = (BulkResponse) response.getBody();
 
     assertThat(bulkResponse.getErrorResponse()).isNull();
     assertThat(bulkResponse.getStatus()).isEqualTo(Response.Status.OK);
     assertThat(bulkResponse.getSchemas()).containsOnly(BulkResponse.SCHEMA_URI);
-    assertThat(bulkResponse.getOperations())
+
+    List<BulkOperation> blkOperation = bulkResponse.getOperations();
+
+    assertThat(blkOperation)
       .hasSize(2)
       .contains(new BulkOperation()
         .setMethod(BulkOperation.Method.POST)
@@ -189,18 +184,12 @@ public class BulkResourceImplTest {
 
 
     BulkResourceImpl impl = new BulkResourceImpl(schemaRegistry, repositoryRegistry);
-    UriInfo uriInfo = mock(UriInfo.class);
-    UriBuilder uriBuilder = mock(UriBuilder.class);
-    when(uriInfo.getBaseUriBuilder()).thenReturn(uriBuilder);
-    when(uriBuilder.path("/Users")).thenReturn(uriBuilder);
-    when(uriBuilder.path("alice-id")).thenReturn(uriBuilder);
-    when(uriBuilder.path("bob-id")).thenReturn(uriBuilder);
-    when(uriBuilder.build())
-      .thenReturn(URI.create("https://scim.example.com/Users/alice-id"))
-      .thenReturn(URI.create("https://scim.example.com/Users/bob-id"));
 
-    Response response = impl.doBulk(bulkRequest, uriInfo);
-    BulkResponse bulkResponse = (BulkResponse) response.getEntity();
+    // Create a mock HttpServletRequest
+    UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromUriString("https://scim.example.com/Bulk");
+
+    ResponseEntity response = impl.doBulk(bulkRequest, uriComponentsBuilder);
+    BulkResponse bulkResponse = (BulkResponse) response.getBody();
 
     assertThat(bulkResponse.getErrorResponse()).isNull();
     assertThat(bulkResponse.getStatus()).isEqualTo(Response.Status.BAD_REQUEST);

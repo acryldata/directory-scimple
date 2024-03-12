@@ -19,23 +19,25 @@
 
 package org.apache.directory.scim.server.rest;
 
-import java.util.*;
-import java.util.regex.Pattern;
-
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
-import jakarta.ws.rs.core.UriInfo;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.directory.scim.spec.exception.ResourceException;
-import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
-import org.apache.directory.scim.server.exception.UnableToDeleteResourceException;
-import org.apache.directory.scim.server.exception.UnableToRetrieveResourceException;
-import org.apache.directory.scim.server.exception.UnableToUpdateResourceException;
 import org.apache.directory.scim.core.repository.Repository;
 import org.apache.directory.scim.core.repository.RepositoryRegistry;
+import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.apache.directory.scim.protocol.BulkResource;
 import org.apache.directory.scim.protocol.data.BulkOperation;
 import org.apache.directory.scim.protocol.data.BulkOperation.Method;
@@ -43,17 +45,26 @@ import org.apache.directory.scim.protocol.data.BulkOperation.StatusWrapper;
 import org.apache.directory.scim.protocol.data.BulkRequest;
 import org.apache.directory.scim.protocol.data.BulkResponse;
 import org.apache.directory.scim.protocol.data.ErrorResponse;
+import org.apache.directory.scim.server.exception.UnableToCreateResourceException;
+import org.apache.directory.scim.server.exception.UnableToDeleteResourceException;
+import org.apache.directory.scim.server.exception.UnableToRetrieveResourceException;
+import org.apache.directory.scim.server.exception.UnableToUpdateResourceException;
+import org.apache.directory.scim.spec.exception.ResourceException;
 import org.apache.directory.scim.spec.resources.BaseResource;
 import org.apache.directory.scim.spec.resources.ScimResource;
 import org.apache.directory.scim.spec.schema.Schema;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.util.UriComponentsBuilder;
 
 
 @Slf4j
 @ApplicationScoped
+@RestController
+@RequestMapping("/scim/v2/Bulk")
 public class BulkResourceImpl implements BulkResource {
 //  private static final StatusWrapper OKAY_STATUS = new StatusWrapper();
 //  private static final StatusWrapper CREATED_STATUS = new StatusWrapper();
@@ -101,7 +112,7 @@ public class BulkResourceImpl implements BulkResource {
   }
 
   @Override
-  public Response doBulk(BulkRequest request, UriInfo uriInfo) {
+  public ResponseEntity doBulk(BulkRequest request, UriComponentsBuilder uriComponentsBuilder) {
     BulkResponse response;
     int errorCount = 0;
     Integer requestFailOnErrors = request.getFailOnErrors();
@@ -225,7 +236,7 @@ public class BulkResourceImpl implements BulkResource {
 
       if (!errorCountExceeded && !(operationResult.getResponse() instanceof ErrorResponse)) {
         try {
-          this.handleBulkOperationMethod(allUnresolveds, operationResult, bulkIdKeyToOperationResult, uriInfo);
+          this.handleBulkOperationMethod(allUnresolveds, operationResult, bulkIdKeyToOperationResult, uriComponentsBuilder);
         } catch (ResourceException resourceException) {
           log.error("Failed to do bulk operation", resourceException);
 
@@ -321,9 +332,8 @@ public class BulkResourceImpl implements BulkResource {
       .setOperations(bulkOperations)
       .setStatus(status);
 
-    return Response.status(status)
-      .entity(response)
-      .build();
+    return ResponseEntity.status(status.getStatusCode())
+      .body(response);
   }
 
   /**
@@ -379,13 +389,12 @@ public class BulkResourceImpl implements BulkResource {
    * @param unresolveds
    * @param operationResult
    * @param bulkIdKeyToOperationResult
-   * @param uriInfo
    * @throws UnableToCreateResourceException
    * @throws UnableToDeleteResourceException
    * @throws UnableToUpdateResourceException
    * @throws UnresolvableOperationException
    */
-  private void handleBulkOperationMethod(List<IWishJavaHadTuples> unresolveds, BulkOperation operationResult, Map<String, BulkOperation> bulkIdKeyToOperationResult, UriInfo uriInfo) throws ResourceException, UnresolvableOperationException {
+  private void handleBulkOperationMethod(List<IWishJavaHadTuples> unresolveds, BulkOperation operationResult, Map<String, BulkOperation> bulkIdKeyToOperationResult, UriComponentsBuilder uriComponentsBuilder) throws ResourceException, UnresolvableOperationException {
     ScimResource scimResource = operationResult.getData();
     Method bulkOperationMethod = operationResult.getMethod();
     String bulkId = operationResult.getBulkId();
@@ -412,10 +421,16 @@ public class BulkResourceImpl implements BulkResource {
       log.debug("Creating {}", scimResource);
 
       ScimResource newScimResource = repository.create(scimResource);
+
+      UriComponentsBuilder absolutePath = uriComponentsBuilder.replaceQuery(null).replacePath(null);
+
       String bulkOperationPath = operationResult.getPath();
+
       String newResourceId = newScimResource.getId();
-      String newResourceUri = uriInfo.getBaseUriBuilder()
+
+      String newResourceUri = absolutePath
                                      .path(bulkOperationPath)
+                                     .path("/")
                                      .path(newResourceId)
                                      .build()
                                      .toString();
