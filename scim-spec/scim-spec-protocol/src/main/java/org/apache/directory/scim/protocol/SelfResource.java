@@ -84,7 +84,7 @@ public interface SelfResource {
    */
   @GetMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
-  @Operation(description="Get self record")
+  @Operation(description="/Me is not implemented")
   @ApiResponses(value={
     @ApiResponse(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                  schema = @Schema(implementation = ScimResource.class))),
@@ -106,7 +106,7 @@ public interface SelfResource {
   @PostMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
-  @Operation(description = "Create self record")
+  @Operation(description = "/Me is not implemented")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "201",
                  content = @Content(mediaType = SCIM_CONTENT_TYPE,
@@ -132,7 +132,7 @@ public interface SelfResource {
   @PutMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
-  @Operation(description = "Update self record")
+  @Operation(description = "/Me is not implemented")
   @ApiResponses(value = {
     @ApiResponse(content = @Content(mediaType = SCIM_CONTENT_TYPE,
                  schema = @Schema(implementation = ScimResource.class))),
@@ -150,7 +150,7 @@ public interface SelfResource {
   @PatchMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
   @Consumes({SCIM_CONTENT_TYPE, APPLICATION_JSON})
   @Produces({SCIM_CONTENT_TYPE, APPLICATION_JSON})
-  @Operation(description = "Patch a portion of the backing store")
+  @Operation(description = "/Me is not implemented")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204",
                  content = @Content(mediaType = SCIM_CONTENT_TYPE,
@@ -168,7 +168,7 @@ public interface SelfResource {
   }
 
   @DeleteMapping(produces = {Constants.SCIM_CONTENT_TYPE, MediaType.APPLICATION_JSON})
-  @Operation(description = "Delete self record")
+  @Operation(description = "/Me is not implemented")
   @ApiResponses(value = {
     @ApiResponse(responseCode = "204", description = "No Content"),
     @ApiResponse(responseCode = "400", description = "Bad Request"),

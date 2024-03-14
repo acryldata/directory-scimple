@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.directory.scim.server.rest;
+package org.apache.directory.scim.server.it;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Arrays;
@@ -74,20 +74,6 @@ public class SpringScimJacksonXmlBindJsonProvider implements WebMvcConfigurer {
   }
 
   @Override
-  public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-    configurer
-      .favorPathExtension(false)
-      .favorParameter(true)
-      .parameterName("format")
-      .ignoreAcceptHeader(true)
-      .useRegisteredExtensionsOnly(true)
-      .mediaType("json", MediaType.APPLICATION_JSON)
-      .mediaType("xml", MediaType.APPLICATION_XML)
-      .mediaType("scim+json", MediaType.APPLICATION_JSON)
-      .defaultContentType(MediaType.valueOf(Constants.SCIM_CONTENT_TYPE));
-  }
-
-  @Override
   public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
     converters.add(jsonMessageConverter(schemaRegistry));
     converters.add(xmlMessageConverter(schemaRegistry));
@@ -95,7 +81,6 @@ public class SpringScimJacksonXmlBindJsonProvider implements WebMvcConfigurer {
 
   @Override
   public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-    converters.clear();
     converters.add(jsonMessageConverter(schemaRegistry));
     converters.add(xmlMessageConverter(schemaRegistry));
   }

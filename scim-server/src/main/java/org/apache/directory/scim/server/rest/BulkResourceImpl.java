@@ -349,17 +349,19 @@ public class BulkResourceImpl implements BulkResource {
     BulkOperation operationResult = bulkIdKeyToOperationResult.get(bulkIdKeyToCleanup);
     String bulkId = operationResult.getBulkId();
     ScimResource scimResource = operationResult.getData();
-    @SuppressWarnings("unchecked")
-    Class<ScimResource> scimResourceClass = (Class<ScimResource>) scimResource.getClass();
-    Repository<ScimResource> repository = this.repositoryRegistry.getRepository(scimResourceClass);
+    if (scimResource != null) {
+      Class<ScimResource> scimResourceClass = (Class<ScimResource>) scimResource.getClass();
+      Repository<ScimResource> repository = this.repositoryRegistry.getRepository(scimResourceClass);
 
-    try {
-      if (StringUtils.isNotBlank(scimResource.getId())) {
-        repository.delete(scimResource.getId());
+      try {
+        if (StringUtils.isNotBlank(scimResource.getId())) {
+          repository.delete(scimResource.getId());
+        }
+      } catch (ResourceException unableToDeleteResourceException) {
+        log.error("Could not delete ScimResource after failure: {}", scimResource);
       }
-    } catch (ResourceException unableToDeleteResourceException) {
-      log.error("Could not delete ScimResource after failure: {}", scimResource);
     }
+
     for (String dependentBulkIdKey : reverseDependencies) {
       BulkOperation dependentOperationResult = bulkIdKeyToOperationResult.get(dependentBulkIdKey);
 

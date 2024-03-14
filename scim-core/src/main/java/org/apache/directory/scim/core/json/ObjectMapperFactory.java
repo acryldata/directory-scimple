@@ -34,6 +34,8 @@ import org.apache.directory.scim.core.schema.SchemaRegistry;
 import org.apache.directory.scim.spec.resources.ScimExtension;
 import org.apache.directory.scim.spec.resources.ScimResource;
 
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
 import java.io.IOException;
 
 /**
@@ -75,7 +77,7 @@ public class ObjectMapperFactory {
    * Creates and configures an {@link ObjectMapper} SCIM Resource in REST request and responses {@code application/scim+json}.
    */
   public static ObjectMapper createObjectMapper(SchemaRegistry schemaRegistry) {
-    ObjectMapper objectMapper = createObjectMapper(new ObjectMapper()).copy();
+    ObjectMapper objectMapper = createObjectMapper(Jackson2ObjectMapperBuilder.json().build()).copy();
     addSchemaRegistry(objectMapper, schemaRegistry);
     return objectMapper;
   }
