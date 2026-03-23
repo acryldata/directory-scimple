@@ -31,6 +31,16 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class FilterBuilderTest {
 
   @Test
+  public void testExtendedCharsAnd() throws FilterParseException {
+    Filter filter = FilterBuilder.create()
+      .equalTo("name.givenName", "Bílbo")
+      .and(r -> r.equalTo("name.familyName", "Bággins"))
+      .build();
+    Filter expected = new Filter("name.givenName EQ \"Bílbo\" AND name.familyName EQ \"Bággins\"");
+    assertThat(filter).isEqualTo(expected);
+  }
+
+  @Test
   public void testSimpleAnd() throws FilterParseException {
     Filter filter = FilterBuilder.create()
       .equalTo("name.givenName", "Bilbo")
