@@ -34,7 +34,7 @@
 
   <properties>
     <project.build.outputTimestamp>2024-03-15T12:03:27Z</project.build.outputTimestamp>
-    <jdk.version>11</jdk.version>
+    <jdk.version>17</jdk.version>
     <max.jdk.version>${jdk.version}</max.jdk.version>
     <maven.compiler.source>${jdk.version}</maven.compiler.source>
     <maven.compiler.target>${jdk.version}</maven.compiler.target>
