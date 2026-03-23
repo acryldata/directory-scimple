@@ -346,15 +346,16 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
 
   private URI buildLocationTag(T resource) {
     String id = resource.getId();
-    if (id == null) {
-      LOG.warn("Repository must supply an id for a resource");
-      id = "unknown";
+    String currentUri = ServletUriComponentsBuilder.fromCurrentRequestUri()
+      .replaceQuery(null).build().toUriString();
+
+    // For GET/PUT/PATCH the id is already in the request URI (e.g. /Users/{id}).
+    // For POST (create) the id is NOT yet in the URI (e.g. /Users), so append it.
+    if (id == null || currentUri.endsWith("/" + id)) {
+      return URI.create(currentUri);
     }
-
-    // TODO: Fix it for id in pathSegment while creating resource
-    return ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null)
-      .build().toUri();
-
+    return ServletUriComponentsBuilder.fromCurrentRequestUri()
+      .replaceQuery(null).pathSegment(id).build().toUri();
   }
 
   private <T extends ScimResource> T attributesForDisplay(T resource, Set<AttributeReference> includedAttributes, Set<AttributeReference> excludedAttributes) throws AttributeException {
