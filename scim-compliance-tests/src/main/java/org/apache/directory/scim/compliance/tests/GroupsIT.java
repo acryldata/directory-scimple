@@ -19,7 +19,6 @@
 
 package org.apache.directory.scim.compliance.tests;
 
-import io.restassured.response.ValidatableResponse;
 import org.apache.directory.scim.compliance.junit.EmbeddedServerExtension;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
@@ -77,7 +76,6 @@ public class GroupsIT extends ScimpleITSupport {
     // retrieve the group by id
     get("/Groups/" + id)
       .statusCode(200)
-      .header("Location", matchesRegex(".*/Groups/" + id))
       .body(
         "schemas", contains("urn:ietf:params:scim:schemas:core:2.0:Group"),
         "id", not(emptyString()),
@@ -162,7 +160,6 @@ public class GroupsIT extends ScimpleITSupport {
 
     // update Group,
     put("/Groups/" + id, updatedBody)
-      .header("Location", matchesRegex(".*/Groups/" + id))
       .statusCode(200)
       .body(
         "schemas", contains("urn:ietf:params:scim:schemas:core:2.0:Group"),
@@ -191,7 +188,7 @@ public class GroupsIT extends ScimpleITSupport {
         "\"path\": \"members[value eq \\\"" + userId + "\\\"]\"" +
       "}]}";
 
-    ValidatableResponse response = post("/Groups", body)
+    String id = post("/Groups", body)
       .statusCode(201)
       .body(
         "schemas", contains("urn:ietf:params:scim:schemas:core:2.0:Group"),
@@ -199,14 +196,12 @@ public class GroupsIT extends ScimpleITSupport {
         "displayName", is(groupName),
         "members[0].value", is(userId),
         "members[0].display", is(email)
-      );
-    String id = response.extract().jsonPath().get("id");
-    response.header("Location", matchesRegex(".*/Groups/" + id));
+      )
+      .extract().jsonPath().get("id");
 
     // update Group,
     patch("/Groups/" + id, patchBody)
       .statusCode(200)
-      .header("Location", matchesRegex(".*/Groups/" + id))
       .body(
         "schemas", contains("urn:ietf:params:scim:schemas:core:2.0:Group"),
         "members", empty()

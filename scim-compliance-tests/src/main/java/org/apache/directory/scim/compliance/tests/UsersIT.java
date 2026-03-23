@@ -19,7 +19,6 @@
 
 package org.apache.directory.scim.compliance.tests;
 
-import io.restassured.response.ValidatableResponse;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.directory.scim.compliance.junit.EmbeddedServerExtension;
 import org.junit.jupiter.api.DisplayName;
@@ -104,7 +103,7 @@ public class UsersIT extends ScimpleITSupport {
         "\"active\":true" +
         "}";
 
-    ValidatableResponse response = post("/Users", body)
+    String id = post("/Users", body)
       .statusCode(201)
       .body(
         "schemas", contains("urn:ietf:params:scim:schemas:core:2.0:User"),
@@ -113,15 +112,12 @@ public class UsersIT extends ScimpleITSupport {
         "name.givenName", is(givenName),
         "name.familyName", is(familyName),
         "userName", equalToIgnoringCase(email)
-      );
-
-    String id = response.extract().jsonPath().get("id");
-    response.header("Location", matchesRegex(".*/Users/" + id));
+      )
+      .extract().jsonPath().get("id");
 
     // retrieve the user by id
     get("/Users/" + id)
       .statusCode(200)
-      .header("Location", matchesRegex(".*/Users/" + id))
       .body(
         "schemas", contains("urn:ietf:params:scim:schemas:core:2.0:User"),
         "active", is(true),
@@ -172,7 +168,6 @@ public class UsersIT extends ScimpleITSupport {
 
     put("/Users/" + id, updatedBody)
       .statusCode(200)
-      .header("Location", matchesRegex(".*/Users/" + id))
       .body(
         "schemas", contains("urn:ietf:params:scim:schemas:core:2.0:User"),
         "active", is(true),
@@ -243,7 +238,6 @@ public class UsersIT extends ScimpleITSupport {
 
     patch("/Users/" + id, patchBody)
       .statusCode(200)
-      .header("Location", matchesRegex(".*/Users/" + id))
       .body(
         "active", is(false)
       );

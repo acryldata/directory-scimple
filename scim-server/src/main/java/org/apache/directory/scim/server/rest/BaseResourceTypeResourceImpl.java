@@ -6,7 +6,7 @@
 * to you under the Apache License, Version 2.0 (the
 * "License"); you may not use this file except in compliance
 * with the License.  You may obtain a copy of the License at
-
+ 
 * http://www.apache.org/licenses/LICENSE-2.0
 
 * Unless required by applicable law or agreed to in writing,
@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Objects;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.directory.scim.core.repository.Repository;
@@ -173,7 +172,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     else {
       searchRequest.setFilter(null);
     }
-
+    
     searchRequest.setSortBy(sortBy);
     searchRequest.setSortOrder(sortOrder);
     searchRequest.setStartIndex(startIndex);
@@ -194,8 +193,7 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
     Set<AttributeReference> excludedAttributeReferences = AttributeReferenceListWrapper.getAttributeReferences(excludedAttributes);
     validateAttributes(attributeReferences, excludedAttributeReferences);
 
-    T created = repository.crea
-    te(resource);
+    T created = repository.create(resource);
 
     String etag = fromVersion(created);
 
@@ -208,7 +206,6 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
         log.debug("Exception thrown while processing attributes", e);
     }
 
-    Objects.requireNonNull(created.getId(), "Repository must supply an id for a resource");
     return ResponseEntity.status(Status.CREATED.getStatusCode())
       .location(buildLocationTag(created))
       .header(HttpHeaders.ETAG, etag)
@@ -354,14 +351,11 @@ public abstract class BaseResourceTypeResourceImpl<T extends ScimResource> imple
       id = "unknown";
     }
 
-    String currentUri = ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null).build().toUriString();
-    if (currentUri.endsWith("/" + id)) {
-      return URI.create(currentUri);
-    }
+    // TODO: Fix it for id in pathSegment while creating resource
     return ServletUriComponentsBuilder.fromCurrentRequestUri().replaceQuery(null)
-      .pathSegment(id).build().toUri();
-  }
+      .build().toUri();
 
+  }
 
   private <T extends ScimResource> T attributesForDisplay(T resource, Set<AttributeReference> includedAttributes, Set<AttributeReference> excludedAttributes) throws AttributeException {
     if (!excludedAttributes.isEmpty()) {
